@@ -9,10 +9,15 @@ import { ToastContainer } from './components/Toast';
 import PatientsList from './pages/PatientsList';
 import PatientProfile from './pages/PatientProfile';
 import Appointments from './pages/Appointments';
+import DoctorDashboard from './pages/DoctorDashboard';
+import PatientHistory from './pages/PatientHistory';
 
 // Dashboard View
 const Dashboard = () => {
   const { user } = useAuth();
+  if (user?.role === 'doctor') {
+    return <DoctorDashboard />;
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -243,6 +248,18 @@ function AppContent() {
               <LayoutShell>
                 <PatientProfile />
               </LayoutShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patients/:id/history"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'staff']}>
+                <LayoutShell>
+                  <PatientHistory />
+                </LayoutShell>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />

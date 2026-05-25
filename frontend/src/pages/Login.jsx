@@ -28,15 +28,14 @@ export default function Login() {
     setError(null);
 
     if (!email || !password) {
-      setValidationError('Please fill in all credentials.');
-      addToast('Validation failed. Please enter all credentials.', 'error');
+      setValidationError('Please enter both your clinical email and security password.');
+      addToast('Please enter both email and password.', 'error');
       return;
     }
 
     setSubmitting(true);
     try {
       await login(email, password);
-      // If remember me is set, we could save email to local storage (optional UX touch)
       if (rememberMe) {
         localStorage.setItem('savedEmail', email);
       } else {
@@ -53,7 +52,7 @@ export default function Login() {
   const handleForgotSubmit = (e) => {
     e.preventDefault();
     if (!forgotEmail) {
-      addToast('Please enter a valid email address.', 'error');
+      addToast('Please enter your email to proceed.', 'error');
       return;
     }
     setForgotSending(true);
@@ -69,123 +68,123 @@ export default function Login() {
     <div className="min-h-screen w-screen flex bg-slate-950 font-sans overflow-hidden relative">
       
       {/* ----------------- LEFT PANEL: EXPERIENCE & BRANDING ----------------- */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-950 via-slate-950 to-cyan-950 p-16 flex-col justify-between relative overflow-hidden border-r border-slate-900">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-950 via-slate-950 to-cyan-950 p-16 flex-col justify-between relative overflow-hidden border-r border-slate-900 select-none">
         
-        {/* Immersive mesh circles */}
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        {/* Glowing glassmorphic circles */}
+        <div className="absolute top-[-20%] left-[-15%] w-[700px] h-[700px] bg-blue-600/10 rounded-full blur-[130px] pointer-events-none animate-pulse duration-[8000ms]"></div>
+        <div className="absolute bottom-[-20%] right-[-15%] w-[700px] h-[700px] bg-teal-500/10 rounded-full blur-[130px] pointer-events-none animate-pulse duration-[10000ms]"></div>
 
-        {/* Decorative Grid Overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30"></div>
+        {/* Mesh Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:5rem_5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-40"></div>
 
-        {/* Logo and Tag */}
+        {/* Branding header */}
         <div className="flex items-center gap-3 relative z-10 animate-in fade-in duration-700">
-          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white shadow-lg shadow-blue-500/20">
+          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white shadow-xl shadow-blue-500/30 ring-1 ring-white/10">
             <Activity className="w-6 h-6" />
           </div>
           <div>
-            <span className="font-extrabold text-white text-lg tracking-tight block">MedOS</span>
-            <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block">AI Healthcare Platform</span>
+            <span className="font-black text-white text-xl tracking-tight block">MedOS</span>
+            <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block mt-0.5">AI Clinical Intelligence</span>
           </div>
         </div>
 
-        {/* Floating AI Glassmorphic Panel */}
+        {/* Center Floating Glass Panel */}
         <div className="my-auto relative z-10 animate-in slide-in-from-left-8 duration-1000">
-          <div className="bg-slate-900/40 border border-slate-800/80 backdrop-blur-2xl rounded-3xl p-8 max-w-md shadow-2xl relative">
-            <div className="absolute -top-3 -right-3 bg-cyan-500 text-slate-950 p-1.5 rounded-xl shadow-lg animate-pulse">
-              <Sparkles className="w-4 h-4" />
+          <div className="bg-slate-900/30 border border-white/5 backdrop-blur-3xl rounded-[32px] p-8 max-w-md shadow-2xl relative">
+            <div className="absolute -top-3.5 -right-3.5 bg-gradient-to-tr from-cyan-400 to-blue-500 text-slate-950 p-2 rounded-2xl shadow-xl shadow-cyan-400/20">
+              <Sparkles className="w-4 h-4 animate-spin-slow text-slate-950" />
             </div>
             
-            <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase px-3 py-1 rounded-full tracking-wider inline-block">
-              Clinical Core Model v3.5
+            <span className="bg-blue-500/15 text-blue-300 border border-blue-500/30 text-[9px] font-bold uppercase px-3 py-1 rounded-full tracking-wider inline-block">
+              Clinical Core Intelligence
             </span>
-            <h2 className="text-2xl font-bold text-white mt-4 leading-tight">
-              Augmented Diagnostics & Patient Orchestration
+            <h2 className="text-3xl font-extrabold text-white mt-4 leading-tight tracking-tight">
+              Augmented Diagnostics & Patient Flow
             </h2>
-            <p className="text-slate-400 mt-2 text-sm leading-relaxed">
-              Empowering clinics with real-time risk stratification models, predictive scheduling algorithms, and modular EHR system interfaces.
+            <p className="text-slate-400 mt-3 text-sm leading-relaxed font-medium">
+              Empowering healthcare facilities with deep clinical indexing, predictive appointment queues, and structured electronic health files (EHR).
             </p>
 
-            {/* Quick Stats inside card */}
-            <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-800/50">
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-800/40">
               <div>
-                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">AI Inference Time</span>
-                <span className="text-white font-bold block text-lg">18.4ms avg</span>
+                <span className="text-slate-500 text-[9px] uppercase font-bold tracking-wider">Queue Latency</span>
+                <span className="text-white font-extrabold block text-lg mt-0.5">18.4ms avg</span>
               </div>
               <div>
-                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Triage Accuracy</span>
-                <span className="text-white font-bold block text-lg">99.86% validated</span>
+                <span className="text-slate-500 text-[9px] uppercase font-bold tracking-wider">Classification</span>
+                <span className="text-white font-extrabold block text-lg mt-0.5">99.86% Accurate</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="flex items-center justify-between text-xs text-slate-500 relative z-10">
+        {/* Footer */}
+        <div className="flex items-center justify-between text-xs text-slate-500 relative z-10 font-medium">
           <span className="flex items-center gap-1.5">
             <Heart className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-            Validated Clinical Standards
+            Validated Medical Safety Standards
           </span>
-          <span>Security Protocol AES-256</span>
+          <span>Security AES-256</span>
         </div>
       </div>
 
       {/* ----------------- RIGHT PANEL: AUTHENTICATION FORM ----------------- */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-950 relative overflow-y-auto min-h-screen">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-slate-950 relative overflow-y-auto min-h-screen">
         
         {/* Background graphic for mobile screens */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none lg:hidden"></div>
 
-        <div className="w-full max-w-md bg-slate-900/30 border border-slate-800/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
+        <div className="w-full max-w-md bg-slate-900/20 border border-slate-800/70 backdrop-blur-2xl rounded-[32px] p-8 sm:p-10 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
           
           {/* Mobile Header Branding */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <div className="bg-blue-600 p-2.5 rounded-xl text-white mb-3 shadow-lg shadow-blue-500/20">
+            <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white mb-3 shadow-lg shadow-blue-500/25">
               <Activity className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-extrabold text-white">MedOS Control Center</h2>
+            <h2 className="text-2xl font-black text-white tracking-tight">MedOS Secure Portal</h2>
           </div>
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-8">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Access Secure Console</h1>
-            <p className="text-slate-400 mt-2 text-sm leading-relaxed">
-              Enter your clinical credentials to review active patients, diagnostics systems, and hospital command nodes.
+            <h1 className="text-3xl font-black text-white tracking-tight leading-none">Access Secure Console</h1>
+            <p className="text-slate-400 mt-3 text-sm leading-relaxed font-medium">
+              Enter your clinical credentials to authenticate your connection to the MedOS medical control panels.
             </p>
           </div>
 
-          {/* Validation Warnings */}
-          {validationError && (
-            <div className="bg-rose-950/40 border border-rose-500/20 text-rose-300 p-4 rounded-2xl text-xs mb-6 flex items-start gap-3">
+          {/* Error Banner */}
+          {error && (
+            <div className="bg-rose-950/40 border border-rose-500/20 text-rose-300 p-4 rounded-2xl text-xs mb-6 flex items-start gap-3 animate-in slide-in-from-top-2">
               <span className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0 animate-pulse"></span>
-              <span>{validationError}</span>
+              <span className="font-semibold">{error}</span>
             </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Email Address</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Clinician Email</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500 group-focus-within:text-blue-500 transition" />
                 <input
                   type="email"
                   required
-                  placeholder="doctor@hospital.com"
+                  placeholder="practitioner@hospital.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm shadow-inner"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition text-sm shadow-inner font-medium"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Password</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Security Password</label>
                 <button
                   type="button"
                   onClick={() => setForgotOpen(true)}
-                  className="text-xs text-blue-500 font-semibold hover:text-blue-400 transition"
+                  className="text-xs text-blue-500 font-bold hover:text-blue-400 transition"
                 >
                   Forgot password?
                 </button>
@@ -198,19 +197,19 @@ export default function Login() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm shadow-inner"
+                  className="w-full pl-12 pr-12 py-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition text-sm shadow-inner font-medium"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-3.5 text-slate-500 hover:text-white transition"
+                  className="absolute right-4 top-3.5 text-slate-500 hover:text-white transition p-0.5 rounded-lg hover:bg-slate-900"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me Toggle */}
+            {/* Remember me toggle */}
             <div className="flex items-center gap-2 py-1">
               <input
                 type="checkbox"
@@ -219,36 +218,36 @@ export default function Login() {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="w-4 h-4 rounded border-slate-800 bg-slate-950 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
               />
-              <label htmlFor="remember" className="text-xs font-semibold text-slate-400 hover:text-slate-300 transition cursor-pointer select-none">
-                Remember this terminal
+              <label htmlFor="remember" className="text-xs font-semibold text-slate-450 hover:text-slate-350 transition cursor-pointer select-none">
+                Remember this clinical terminal
               </label>
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3.5 rounded-2xl text-sm font-semibold hover:from-blue-500 hover:to-cyan-500 hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group mt-2"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl text-sm font-bold hover:from-blue-500 hover:to-cyan-500 hover:shadow-xl hover:shadow-blue-500/10 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group mt-2"
             >
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  Authenticating Console...
+                  Verifying clinical keys...
                 </>
               ) : (
                 <>
-                  Sign In to Console
+                  Authenticate Connection
                   <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Toggle Screen */}
+          {/* Registration toggle */}
           <div className="mt-8 text-center border-t border-slate-900 pt-6">
-            <p className="text-xs text-slate-400">
-              Setting up a new clinic profile?{' '}
+            <p className="text-xs text-slate-450 font-medium">
+              First time deploying credentials here?{' '}
               <Link to="/register" className="text-blue-500 font-bold hover:underline hover:text-blue-400 transition ml-1">
-                Register account
+                Register clinical profile
               </Link>
             </p>
           </div>
@@ -257,8 +256,8 @@ export default function Login() {
 
       {/* ----------------- FORGOT PASSWORD MODAL OVERLAY ----------------- */}
       {forgotOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-[28px] p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
             
             <button
               onClick={() => setForgotOpen(false)}
@@ -268,34 +267,34 @@ export default function Login() {
             </button>
 
             <div className="flex items-center gap-2 mb-3">
-              <div className="bg-blue-600/20 text-blue-400 p-1.5 rounded-lg">
+              <div className="bg-blue-600/15 text-blue-400 p-2 rounded-xl">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-white text-base">Recover Credentials</h3>
+              <h3 className="font-extrabold text-white text-base">Recover Credentials</h3>
             </div>
             
-            <p className="text-xs text-slate-400 leading-relaxed mb-4">
-              Enter your clinical email address and we'll dispatch instructions to reset your secure portal password.
+            <p className="text-xs text-slate-400 leading-relaxed mb-4 font-medium">
+              Enter your clinical email address and we'll dispatch reset instructions to recover your console key.
             </p>
 
             <form onSubmit={handleForgotSubmit} className="space-y-4">
               <input
                 type="email"
                 required
-                placeholder="doctor@hospital.com"
+                placeholder="doctor@medos.com"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs shadow-inner"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-xs shadow-inner font-medium"
               />
               <button
                 type="submit"
                 disabled={forgotSending}
-                className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-xs font-semibold hover:bg-blue-500 transition duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="w-full bg-blue-600 text-white py-3 rounded-2xl text-xs font-bold hover:bg-blue-500 transition duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-md shadow-blue-600/10"
               >
                 {forgotSending ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Sending...
+                    Dispatching recovery keys...
                   </>
                 ) : (
                   <>
