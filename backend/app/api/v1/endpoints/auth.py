@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -129,3 +129,16 @@ def read_user_me(
     Get current logged in user details.
     """
     return current_user
+
+
+@router.get("/doctors", response_model=List[schemas.appointment.DoctorSelector])
+def get_all_doctors(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Fetch all active users registered as Doctors.
+    """
+    doctors = db.query(User).filter(User.role == "doctor", User.is_active == True).all()
+    return doctors
+

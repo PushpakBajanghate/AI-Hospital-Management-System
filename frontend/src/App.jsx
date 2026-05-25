@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import { ToastContainer } from './components/Toast';
 import PatientsList from './pages/PatientsList';
 import PatientProfile from './pages/PatientProfile';
+import Appointments from './pages/Appointments';
 
 // Dashboard View
 const Dashboard = () => {
@@ -138,6 +139,13 @@ const LayoutShell = ({ children }) => {
             Patients
           </Link>
           <Link
+            to="/appointments"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <Calendar className="w-5 h-5 text-slate-400" />
+            Appointments
+          </Link>
+          <Link
             to="/diagnostics"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition dark:text-slate-300 dark:hover:bg-slate-800"
           >
@@ -214,6 +222,16 @@ function AppContent() {
             <ProtectedRoute>
               <LayoutShell>
                 <PatientsList />
+              </LayoutShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <Appointments />
               </LayoutShell>
             </ProtectedRoute>
           }
