@@ -4,12 +4,20 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, engine
+from app.models.base import Base
+from app.api.v1.api import api_router
+
+# Auto-generate DB tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+# Register routes
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:
