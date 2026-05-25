@@ -7,6 +7,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = (message, type = 'info') => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // Re-authenticate user session on mount
   useEffect(() => {
@@ -39,10 +49,12 @@ export const AuthProvider = ({ children }) => {
       // Fetch fresh profile details
       const profileResponse = await api.get('/api/v1/auth/me');
       setUser(profileResponse.data);
+      addToast(`Welcome back, ${profileResponse.data.full_name || 'User'}!`, 'success');
       return profileResponse.data;
     } catch (err) {
       const errMsg = err.response?.data?.detail || 'Login failed. Please check your credentials.';
       setError(errMsg);
+      addToast(errMsg, 'error');
       throw new Error(errMsg);
     }
   };
@@ -56,10 +68,12 @@ export const AuthProvider = ({ children }) => {
         password,
         role,
       });
+      addToast('Profile successfully registered! Redirecting...', 'success');
       return response.data;
     } catch (err) {
       const errMsg = err.response?.data?.detail || 'Registration failed. Try again.';
       setError(errMsg);
+      addToast(errMsg, 'error');
       throw new Error(errMsg);
     }
   };
@@ -68,10 +82,24 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
+    addToast('Signed out of MedOS secure console.', 'info');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, setError }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        toasts,
+        login,
+        register,
+        logout,
+        setError,
+        addToast,
+        removeToast,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

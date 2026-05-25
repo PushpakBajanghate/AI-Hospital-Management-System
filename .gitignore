@@ -13,6 +13,9 @@ backend/.venv/
 backend/venv/
 backend/env/
 backend/.env
+**/__pycache__/
+*.db
+*.sqlite
 
 # Local Environment Variables
 .env

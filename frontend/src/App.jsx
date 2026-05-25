@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute, RoleProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { ToastContainer } from './components/Toast';
 
 // Dashboard View
 const Dashboard = () => {
@@ -192,49 +193,59 @@ const LayoutShell = ({ children }) => {
   );
 };
 
+function AppContent() {
+  const { toasts, removeToast } = useAuth();
+  return (
+    <>
+      <Routes>
+        {/* Public Views */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected Console Views */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <Dashboard />
+              </LayoutShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patients"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <Patients />
+              </LayoutShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diagnostics"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'staff']}>
+                <LayoutShell>
+                  <Diagnostics />
+                </LayoutShell>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <ToastContainer toasts={toasts} onClose={removeToast} />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          {/* Public Views */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Protected Console Views */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <LayoutShell>
-                  <Dashboard />
-                </LayoutShell>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/patients"
-            element={
-              <ProtectedRoute>
-                <LayoutShell>
-                  <Patients />
-                </LayoutShell>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/diagnostics"
-            element={
-              <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'staff']}>
-                  <LayoutShell>
-                    <Diagnostics />
-                  </LayoutShell>
-                </RoleProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <AppContent />
       </AuthProvider>
     </Router>
   );

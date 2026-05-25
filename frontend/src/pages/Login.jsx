@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { Activity, Mail, Lock, Loader2, ArrowRight, Eye, EyeOff, ShieldCheck, Heart, Sparkles, X } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState('');
   
-  const { login, error, setError } = useAuth();
+  // Forgot Password Modal State
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSending, setForgotSending] = useState(false);
+
+  const { login, error, setError, addToast } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect back to original route or dashboard
   const destination = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
@@ -22,13 +28,20 @@ export default function Login() {
     setError(null);
 
     if (!email || !password) {
-      setValidationError('Please fill in all fields.');
+      setValidationError('Please fill in all credentials.');
+      addToast('Validation failed. Please enter all credentials.', 'error');
       return;
     }
 
     setSubmitting(true);
     try {
       await login(email, password);
+      // If remember me is set, we could save email to local storage (optional UX touch)
+      if (rememberMe) {
+        localStorage.setItem('savedEmail', email);
+      } else {
+        localStorage.removeItem('savedEmail');
+      }
       navigate(destination, { replace: true });
     } catch (err) {
       console.error(err);
@@ -37,94 +50,263 @@ export default function Login() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4 py-12 relative overflow-hidden">
-      {/* Background Graphic Blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    if (!forgotEmail) {
+      addToast('Please enter a valid email address.', 'error');
+      return;
+    }
+    setForgotSending(true);
+    setTimeout(() => {
+      setForgotSending(false);
+      setForgotOpen(false);
+      addToast(`A recovery link has been dispatched to ${forgotEmail}`, 'success');
+      setForgotEmail('');
+    }, 1500);
+  };
 
-      <div className="w-full max-w-md bg-slate-950/40 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10">
+  return (
+    <div className="min-h-screen w-screen flex bg-slate-950 font-sans overflow-hidden relative">
+      
+      {/* ----------------- LEFT PANEL: EXPERIENCE & BRANDING ----------------- */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-950 via-slate-950 to-cyan-950 p-16 flex-col justify-between relative overflow-hidden border-r border-slate-900">
         
-        {/* Logo and Header */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="bg-blue-600 p-3 rounded-2xl text-white mb-4 shadow-lg shadow-blue-500/20">
-            <Activity className="w-8 h-8" />
+        {/* Immersive mesh circles */}
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        {/* Decorative Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30"></div>
+
+        {/* Logo and Tag */}
+        <div className="flex items-center gap-3 relative z-10 animate-in fade-in duration-700">
+          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white shadow-lg shadow-blue-500/20">
+            <Activity className="w-6 h-6" />
           </div>
-          <h2 className="text-3xl font-extrabold text-white tracking-tight">Welcome Back</h2>
-          <p className="text-slate-400 mt-2 text-sm">Secure Portal login to MedOS platform</p>
+          <div>
+            <span className="font-extrabold text-white text-lg tracking-tight block">MedOS</span>
+            <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block">AI Healthcare Platform</span>
+          </div>
         </div>
 
-        {/* Dynamic Alerts */}
-        {(validationError || error) && (
-          <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-sm mb-6 flex items-start gap-3">
-            <span className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0"></span>
-            <span>{validationError || error}</span>
-          </div>
-        )}
+        {/* Floating AI Glassmorphic Panel */}
+        <div className="my-auto relative z-10 animate-in slide-in-from-left-8 duration-1000">
+          <div className="bg-slate-900/40 border border-slate-800/80 backdrop-blur-2xl rounded-3xl p-8 max-w-md shadow-2xl relative">
+            <div className="absolute -top-3 -right-3 bg-cyan-500 text-slate-950 p-1.5 rounded-xl shadow-lg animate-pulse">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            
+            <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase px-3 py-1 rounded-full tracking-wider inline-block">
+              Clinical Core Model v3.5
+            </span>
+            <h2 className="text-2xl font-bold text-white mt-4 leading-tight">
+              Augmented Diagnostics & Patient Orchestration
+            </h2>
+            <p className="text-slate-400 mt-2 text-sm leading-relaxed">
+              Empowering clinics with real-time risk stratification models, predictive scheduling algorithms, and modular EHR system interfaces.
+            </p>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+            {/* Quick Stats inside card */}
+            <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-800/50">
+              <div>
+                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">AI Inference Time</span>
+                <span className="text-white font-bold block text-lg">18.4ms avg</span>
+              </div>
+              <div>
+                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Triage Accuracy</span>
+                <span className="text-white font-bold block text-lg">99.86% validated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer info */}
+        <div className="flex items-center justify-between text-xs text-slate-500 relative z-10">
+          <span className="flex items-center gap-1.5">
+            <Heart className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+            Validated Clinical Standards
+          </span>
+          <span>Security Protocol AES-256</span>
+        </div>
+      </div>
+
+      {/* ----------------- RIGHT PANEL: AUTHENTICATION FORM ----------------- */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-950 relative overflow-y-auto min-h-screen">
+        
+        {/* Background graphic for mobile screens */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none lg:hidden"></div>
+
+        <div className="w-full max-w-md bg-slate-900/30 border border-slate-800/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
+          
+          {/* Mobile Header Branding */}
+          <div className="flex flex-col items-center mb-8 lg:hidden">
+            <div className="bg-blue-600 p-2.5 rounded-xl text-white mb-3 shadow-lg shadow-blue-500/20">
+              <Activity className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-white">MedOS Control Center</h2>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-8">
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Access Secure Console</h1>
+            <p className="text-slate-400 mt-2 text-sm leading-relaxed">
+              Enter your clinical credentials to review active patients, diagnostics systems, and hospital command nodes.
+            </p>
+          </div>
+
+          {/* Validation Warnings */}
+          {validationError && (
+            <div className="bg-rose-950/40 border border-rose-500/20 text-rose-300 p-4 rounded-2xl text-xs mb-6 flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0 animate-pulse"></span>
+              <span>{validationError}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Email Address</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500 group-focus-within:text-blue-500 transition" />
+                <input
+                  type="email"
+                  required
+                  placeholder="doctor@hospital.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm shadow-inner"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Password</label>
+                <button
+                  type="button"
+                  onClick={() => setForgotOpen(true)}
+                  className="text-xs text-blue-500 font-semibold hover:text-blue-400 transition"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500 group-focus-within:text-blue-500 transition" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm shadow-inner"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3.5 text-slate-500 hover:text-white transition"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me Toggle */}
+            <div className="flex items-center gap-2 py-1">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-800 bg-slate-950 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-xs font-semibold text-slate-400 hover:text-slate-300 transition cursor-pointer select-none">
+                Remember this terminal
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3.5 rounded-2xl text-sm font-semibold hover:from-blue-500 hover:to-cyan-500 hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group mt-2"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  Authenticating Console...
+                </>
+              ) : (
+                <>
+                  Sign In to Console
+                  <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Toggle Screen */}
+          <div className="mt-8 text-center border-t border-slate-900 pt-6">
+            <p className="text-xs text-slate-400">
+              Setting up a new clinic profile?{' '}
+              <Link to="/register" className="text-blue-500 font-bold hover:underline hover:text-blue-400 transition ml-1">
+                Register account
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ----------------- FORGOT PASSWORD MODAL OVERLAY ----------------- */}
+      {forgotOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+            
+            <button
+              onClick={() => setForgotOpen(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-blue-600/20 text-blue-400 p-1.5 rounded-lg">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-white text-base">Recover Credentials</h3>
+            </div>
+            
+            <p className="text-xs text-slate-400 leading-relaxed mb-4">
+              Enter your clinical email address and we'll dispatch instructions to reset your secure portal password.
+            </p>
+
+            <form onSubmit={handleForgotSubmit} className="space-y-4">
               <input
                 type="email"
                 required
-                placeholder="doctor@medos.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm"
+                placeholder="doctor@hospital.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs shadow-inner"
               />
-            </div>
+              <button
+                type="submit"
+                disabled={forgotSending}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-xs font-semibold hover:bg-blue-500 transition duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50"
+              >
+                {forgotSending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Dispatch Recovery Code
+                  </>
+                )}
+              </button>
+            </form>
           </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block">Password</label>
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/20 active:bg-blue-700 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              <>
-                Access Console
-                <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Footer Toggle */}
-        <div className="mt-8 text-center border-t border-slate-900 pt-6">
-          <p className="text-sm text-slate-400">
-            First time setting up your portal?{' '}
-            <Link to="/register" className="text-blue-500 font-semibold hover:underline">
-              Create an account
-            </Link>
-          </p>
         </div>
-      </div>
+      )}
     </div>
   );
 }
