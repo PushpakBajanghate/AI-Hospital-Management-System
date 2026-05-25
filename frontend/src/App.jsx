@@ -6,6 +6,8 @@ import { ProtectedRoute, RoleProtectedRoute } from './components/ProtectedRoute'
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { ToastContainer } from './components/Toast';
+import PatientsList from './pages/PatientsList';
+import PatientProfile from './pages/PatientProfile';
 
 // Dashboard View
 const Dashboard = () => {
@@ -74,14 +76,7 @@ const Dashboard = () => {
   );
 };
 
-const Patients = () => (
-  <div className="space-y-4">
-    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Patients Management</h1>
-    <div className="bg-white p-6 rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
-      <p className="text-slate-500 dark:text-slate-400">Patients list and AI risk triage features will be rendered here. Anyone authenticated can access this page.</p>
-    </div>
-  </div>
-);
+// Patients placeholder deleted in favor of PatientsList page module
 
 const Diagnostics = () => (
   <div className="space-y-4">
@@ -218,7 +213,17 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <LayoutShell>
-                <Patients />
+                <PatientsList />
+              </LayoutShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patients/:id"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <PatientProfile />
               </LayoutShell>
             </ProtectedRoute>
           }
