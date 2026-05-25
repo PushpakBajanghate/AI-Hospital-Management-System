@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Activity, ShieldAlert, Users, Calendar, LayoutDashboard, Database, LogOut, Lock } from 'lucide-react';
+import { Activity, ShieldAlert, Users, Calendar, LayoutDashboard, Database, LogOut, Lock, Bed } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute, RoleProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -11,6 +11,7 @@ import PatientProfile from './pages/PatientProfile';
 import Appointments from './pages/Appointments';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientHistory from './pages/PatientHistory';
+import BedManagement from './pages/BedManagement';
 
 // Dashboard View
 const Dashboard = () => {
@@ -151,6 +152,13 @@ const LayoutShell = ({ children }) => {
             Appointments
           </Link>
           <Link
+            to="/beds"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <Bed className="w-5 h-5 text-slate-400" />
+            Bed Management
+          </Link>
+          <Link
             to="/diagnostics"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition dark:text-slate-300 dark:hover:bg-slate-800"
           >
@@ -260,6 +268,16 @@ function AppContent() {
                   <PatientHistory />
                 </LayoutShell>
               </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/beds"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <BedManagement />
+              </LayoutShell>
             </ProtectedRoute>
           }
         />
