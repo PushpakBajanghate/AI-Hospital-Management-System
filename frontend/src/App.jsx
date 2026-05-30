@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Activity, ShieldAlert, Users, Calendar, LayoutDashboard, Database, LogOut, Lock, Bed } from 'lucide-react';
+import { Activity, ShieldAlert, Users, Calendar, LayoutDashboard, Database, LogOut, Lock, Bed, Bell } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute, RoleProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -12,6 +12,7 @@ import Appointments from './pages/Appointments';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientHistory from './pages/PatientHistory';
 import BedManagement from './pages/BedManagement';
+import Notifications from './pages/Notifications';
 
 // Dashboard View
 const Dashboard = () => {
@@ -165,6 +166,13 @@ const LayoutShell = ({ children }) => {
             <ShieldAlert className="w-5 h-5 text-slate-400" />
             AI Diagnostics
           </Link>
+          <Link
+            to="/notifications"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <Bell className="w-5 h-5 text-slate-400" />
+            Notification Hub
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-100 space-y-3 dark:border-slate-800">
@@ -290,6 +298,16 @@ function AppContent() {
                   <Diagnostics />
                 </LayoutShell>
               </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <LayoutShell>
+                <Notifications />
+              </LayoutShell>
             </ProtectedRoute>
           }
         />

@@ -10,6 +10,77 @@ from app.models.appointment import Appointment
 from app.models.patient import Patient
 from app.models.user import User
 
+def schedule_appointment_reminder_sms(db: Session, appointment_id: int):
+    try:
+        from datetime import datetime, timedelta, timezone
+        from app.models.appointment import Appointment
+        from app.models.notification import Notification
+        
+        # Refresh appointment with relations loaded
+        appt = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        if not appt or not appt.patient:
+            return
+            
+        # 1. Parse date and time slot
+        try:
+            time_parts = appt.time_slot.split(" ")
+            hh_mm = time_parts[0].split(":")
+            hour = int(hh_mm[0])
+            minute = int(hh_mm[1])
+            if len(time_parts) > 1 and time_parts[1].upper() == "PM" and hour < 12:
+                hour += 12
+            elif len(time_parts) > 1 and time_parts[1].upper() == "AM" and hour == 12:
+                hour = 0
+                
+            date_parts = appt.appointment_date.split("-")
+            year = int(date_parts[0])
+            month = int(date_parts[1])
+            day = int(date_parts[2])
+            
+            appt_dt = datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
+            scheduled_time = appt_dt - timedelta(days=1)
+            
+            if scheduled_time <= datetime.now(timezone.utc):
+                # If within 24h, schedule for 5 seconds in the future so poller triggers it immediately
+                scheduled_time = datetime.now(timezone.utc) + timedelta(seconds=5)
+        except Exception:
+            scheduled_time = datetime.now(timezone.utc) + timedelta(seconds=5)
+            
+        # 2. Build message body
+        msg = (
+            f"Dear {appt.patient.name}, this is a reminder for your appointment with "
+            f"Dr. {appt.doctor.full_name} on {appt.appointment_date} at {appt.time_slot}. "
+            f"Your queue token is #{appt.token_number}. Please arrive 15 minutes before your slot. "
+            f"Reply HELP for info."
+        )
+        
+        # 3. Create Notification record
+        # Check if there's already an active scheduled reminder for this appointment, cancel it
+        existing = db.query(Notification).filter(
+            Notification.patient_id == appt.patient_id,
+            Notification.type == "appointment",
+            Notification.message.like(f"%token is #{appt.token_number}%"),
+            Notification.status == "pending"
+        ).first()
+        
+        if existing:
+            db.delete(existing)
+            
+        notification = Notification(
+            patient_id=appt.patient_id,
+            type="appointment",
+            status="pending",
+            message=msg,
+            phone_number=appt.patient.phone_number,
+            scheduled_time=scheduled_time
+        )
+        db.add(notification)
+        db.commit()
+        print(f"⏰ [Notification Hub] Scheduled appointment reminder SMS for Patient {appt.patient.name} at {scheduled_time}")
+    except Exception as e:
+        print(f"⚠️ [Notification Hub] Error scheduling appointment reminder: {str(e)}")
+
+
 router = APIRouter()
 
 
@@ -75,6 +146,10 @@ def create_appointment(
     db.add(db_appointment)
     db.commit()
     db.refresh(db_appointment)
+    
+    # Schedule SMS reminder
+    schedule_appointment_reminder_sms(db, db_appointment.id)
+    
     return db_appointment
 
 
@@ -183,6 +258,11 @@ def update_appointment(
     db.add(appointment)
     db.commit()
     db.refresh(appointment)
+    
+    # Reschedule SMS reminder if date/time slot updated
+    if rescheduling:
+        schedule_appointment_reminder_sms(db, appointment.id)
+        
     return appointment
 
 

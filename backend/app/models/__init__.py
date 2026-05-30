@@ -5,3 +5,5 @@ from app.models.appointment import Appointment
 from app.models.prescription import Prescription
 from app.models.bed import Bed
 from app.models.admission import Admission
+from app.models.notification import Notification
+

@@ -11,6 +11,59 @@ from app.models.bed import Bed
 from app.models.patient import Patient
 from app.models.user import User
 
+def trigger_discharge_notifications(db: Session, admission_id: int):
+    try:
+        from datetime import datetime, timedelta, timezone
+        from app.models.admission import Admission
+        from app.models.notification import Notification
+        
+        # Load admission with patient & doctor loaded
+        adm = db.query(Admission).filter(Admission.id == admission_id).first()
+        if not adm or not adm.patient:
+            return
+            
+        # 1. Trigger Instant Discharge Summary SMS
+        disc_notes = adm.discharge_notes or "Discharged in stable condition. Take rest."
+        discharge_msg = (
+            f"MedOS Alert: Dear {adm.patient.name}, you have been discharged from MedOS Hospital. "
+            f"Care Guidelines: {disc_notes}. "
+            f"If you experience any chest pain, high fever, or breathing difficulty, call 911 immediately."
+        )
+        
+        discharge_notification = Notification(
+            patient_id=adm.patient_id,
+            type="discharge",
+            status="pending", # Start as pending so scheduler picks it up immediately (e.g. within 5-15 seconds)
+            message=discharge_msg,
+            phone_number=adm.patient.phone_number,
+            scheduled_time=datetime.now(timezone.utc) + timedelta(seconds=2)
+        )
+        db.add(discharge_notification)
+        
+        # 2. Trigger Scheduled Follow-up SMS (7 days from now)
+        followup_time = datetime.now(timezone.utc) + timedelta(days=7)
+        followup_msg = (
+            f"Dear {adm.patient.name}, it has been a week since your discharge from MedOS Hospital. "
+            f"We hope you are recovering well! Please remember to schedule a follow-up consultation "
+            f"if you have not done so. Stay healthy!"
+        )
+        
+        followup_notification = Notification(
+            patient_id=adm.patient_id,
+            type="follow_up",
+            status="pending",
+            message=followup_msg,
+            phone_number=adm.patient.phone_number,
+            scheduled_time=followup_time
+        )
+        db.add(followup_notification)
+        db.commit()
+        
+        print(f"⏰ [Notification Hub] Created instant Discharge SMS and scheduled 7-Day Follow-up SMS for Patient {adm.patient.name}")
+    except Exception as e:
+        print(f"⚠️ [Notification Hub] Error scheduling discharge/followup reminders: {str(e)}")
+
+
 router = APIRouter()
 
 
@@ -188,4 +241,8 @@ def discharge_patient(
     
     db.commit()
     db.refresh(admission)
+    
+    # Trigger Discharge and Follow-up SMS reminders
+    trigger_discharge_notifications(db, admission.id)
+    
     return admission

@@ -53,6 +53,17 @@ def startup_event():
         seed_beds(db)
     finally:
         db.close()
+    
+    # Start SMS scheduler
+    from app.services.scheduler import start_scheduler
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    from app.services.scheduler import stop_scheduler
+    stop_scheduler()
+
 
 # Register routes
 app.include_router(api_router, prefix=settings.API_V1_STR)

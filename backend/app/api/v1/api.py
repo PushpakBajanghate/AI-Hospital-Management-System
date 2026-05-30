@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, patients, appointments, doctor, beds, admissions
+from app.api.v1.endpoints import auth, patients, appointments, doctor, beds, admissions, notifications
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -8,3 +8,5 @@ api_router.include_router(appointments.router, prefix="/appointments", tags=["ap
 api_router.include_router(doctor.router, prefix="/doctor", tags=["doctor"])
 api_router.include_router(beds.router, prefix="/beds", tags=["beds"])
 api_router.include_router(admissions.router, prefix="/admissions", tags=["admissions"])
+api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+
