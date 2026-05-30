@@ -179,3 +179,57 @@ def get_patient_clinical_history(
         "prescriptions": serialized_prescriptions,
         "appointments": serialized_appointments
     }
+
+
+@router.post("/ai-recommendations", response_model=schemas.prescription.AIRecommendationResponse)
+def get_ai_clinical_recommendations(
+    *,
+    db: Session = Depends(get_db),
+    ai_in: schemas.prescription.AIRecommendationRequest,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Generate real-time custom health recommendations assisting the clinician.
+    Analyzes patient EMR demographics, chronic history, allergies, symptoms, and proposed medicines.
+    """
+    if current_user.role != "doctor":
+        raise HTTPException(
+            status_code=403,
+            detail="AI recommendations restricted to registered medical practitioners only."
+        )
+
+    # 1. Fetch Patient profile
+    patient = db.query(Patient).filter(Patient.id == ai_in.patient_id).first()
+    if not patient:
+        raise HTTPException(
+            status_code=404,
+            detail="Target patient clinical record not found."
+        )
+
+    # 2. Build patient profile details
+    patient_profile = {
+        "name": patient.name,
+        "age": patient.age,
+        "gender": patient.gender,
+        "blood_group": patient.blood_group,
+        "allergies": patient.allergies,
+        "disease_history": patient.disease_history
+    }
+
+    # 3. Build clinical context from input request
+    clinical_context = {
+        "symptoms": ai_in.symptoms,
+        "diagnosis": ai_in.diagnosis,
+        "medicines": ai_in.medicines,
+        "instructions": ai_in.instructions
+    }
+
+    # 4. Trigger AI Service
+    from app.services.ai_service import ai_service
+    suggestions, summary = ai_service.generate_recommendations(patient_profile, clinical_context)
+
+    return {
+        "suggestions": suggestions,
+        "summary": summary
+    }
+

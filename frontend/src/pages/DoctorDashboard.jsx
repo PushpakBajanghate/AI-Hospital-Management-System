@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Clock, ShieldCheck, Heart, User, Sparkles, Activity, FileText, CheckCircle, X, ChevronRight, ListCollapse, Loader2, Plus } from 'lucide-react';
+import { Clock, ShieldCheck, Heart, User, Sparkles, Activity, FileText, CheckCircle, X, ChevronRight, ListCollapse, Loader2, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
+
 
 export default function DoctorDashboard() {
   const [stats, setStats] = useState(null);
@@ -19,6 +20,11 @@ export default function DoctorDashboard() {
   const [medicines, setMedicines] = useState('');
   const [instructions, setInstructions] = useState('');
   const [validationError, setValidationError] = useState('');
+
+  // AI Recommendation Assistant States
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [aiSummary, setAiSummary] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   const { user, addToast } = useAuth();
   const navigate = useNavigate();
@@ -47,7 +53,47 @@ export default function DoctorDashboard() {
     setMedicines('');
     setInstructions('');
     setValidationError('');
+    setAiSuggestions([]);
+    setAiSummary('');
+    setAiLoading(false);
     setPrescribeOpen(true);
+  };
+
+  const generateAISuggestions = async () => {
+    if (!activeApp) return;
+    setAiLoading(true);
+    try {
+      const response = await api.post('/api/v1/doctor/ai-recommendations', {
+        patient_id: activeApp.patient_id,
+        symptoms: symptoms || '',
+        diagnosis: diagnosis || '',
+        medicines: medicines || '',
+        instructions: instructions || ''
+      });
+      setAiSuggestions(response.data.suggestions || []);
+      setAiSummary(response.data.summary || '');
+      addToast('AI clinical dossier formulated successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      addToast('Failed to formulate AI clinical recommendations.', 'error');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const appendInstruction = (text) => {
+    setInstructions(prev => {
+      const cleanText = text.trim();
+      if (!prev) return cleanText;
+      // If already present, don't duplicate
+      if (prev.includes(cleanText)) {
+        addToast('Recommendation already exists in instructions.', 'warning');
+        return prev;
+      }
+      if (prev.endsWith('\n')) return prev + cleanText;
+      return prev + '\n' + cleanText;
+    });
+    addToast('Appended suggestion to EMR instructions!', 'success');
   };
 
   const handlePrescriptionSubmit = async (e) => {
@@ -287,13 +333,13 @@ export default function DoctorDashboard() {
       {/* ----------------- SAAS PRESCRIPTION MODAL FORM ----------------- */}
       {prescribeOpen && activeApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-500" />
-                <h3 className="text-base font-bold text-white">Create Clinical Prescription</h3>
+                <h3 className="text-base font-bold text-white">Create Clinical Prescription & AI Assistant</h3>
               </div>
               <button
                 onClick={() => setPrescribeOpen(false)}
@@ -303,100 +349,204 @@ export default function DoctorDashboard() {
               </button>
             </div>
 
-            {/* Validation Alerts */}
-            {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{validationError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handlePrescriptionSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            {/* Split Widescreen Panel */}
+            <div className="grid grid-cols-1 md:grid-cols-12 max-h-[78vh] overflow-y-auto divide-y md:divide-y-0 md:divide-x divide-slate-800/80">
               
-              {/* Patient dossier brief */}
-              <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl flex items-center gap-3">
-                <div className="bg-blue-600/20 text-blue-400 p-2.5 rounded-xl">
-                  <User className="w-5 h-5" />
+              {/* LEFT COLUMN: STANDARD PRESCRIPTION FORM */}
+              <form onSubmit={handlePrescriptionSubmit} className="md:col-span-6 p-6 space-y-4">
+                
+                {/* Patient dossier brief */}
+                <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl flex items-center gap-3">
+                  <div className="bg-blue-600/20 text-blue-400 p-2.5 rounded-xl">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div className="text-xs">
+                    <span className="font-bold text-white block">{activeApp.patient_name}</span>
+                    <span className="text-slate-400 block mt-0.5">
+                      Age: {activeApp.patient_age} yrs | Gender: {activeApp.patient_gender} | Blood: {activeApp.patient_blood_group}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-xs">
-                  <span className="font-bold text-white block">{activeApp.patient_name}</span>
-                  <span className="text-slate-400 block mt-0.5">
-                    Age: {activeApp.patient_age} yrs | Gender: {activeApp.patient_gender} | Blood: {activeApp.patient_blood_group}
-                  </span>
+
+                {/* Validation Alerts */}
+                {validationError && (
+                  <div className="p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>{validationError}</span>
+                  </div>
+                )}
+
+                {/* Symptoms Input */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Presented Symptoms *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g., High grade fever, sore throat, cough for 3 days"
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs shadow-inner"
+                  />
                 </div>
+
+                {/* Diagnosis Input */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Clinical Diagnosis *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g., Acute Streptococcal Tonsillitis"
+                    value={diagnosis}
+                    onChange={(e) => setDiagnosis(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs shadow-inner"
+                  />
+                </div>
+
+                {/* Prescribed Medicines */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Prescribed Medicines (Dosage & Drug) *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    placeholder="1. Amoxicillin 500mg (15 Capsules)&#10;2. Paracetamol 650mg (10 Tablets)"
+                    value={medicines}
+                    onChange={(e) => setMedicines(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs resize-none"
+                  />
+                </div>
+
+                {/* Intake Instructions */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Special Instructions (Intake/Lifestyle) *</label>
+                  <textarea
+                    required
+                    rows={3}
+                    placeholder="Amoxicillin: Take 1 capsule three times daily for 5 days.&#10;Paracetamol: Take 1 tablet every 6 hours as needed for fever."
+                    value={instructions}
+                    onChange={(e) => setInstructions(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs resize-none"
+                  />
+                </div>
+
+                {/* Submit Buttons */}
+                <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+                  <button
+                    type="button"
+                    onClick={() => setPrescribeOpen(false)}
+                    className="px-4 py-2 border border-slate-850 hover:bg-slate-850 text-slate-300 rounded-xl text-xs font-semibold transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {submitting && <Loader2 className="w-3 animate-spin" />}
+                    Save & Finalize EMR
+                  </button>
+                </div>
+              </form>
+
+              {/* RIGHT COLUMN: AI CLINICAL HEALTH RECOMMENDATIONS ASSISTANT */}
+              <div className="md:col-span-6 p-6 bg-slate-950/20 flex flex-col justify-between space-y-5">
+                
+                <div className="space-y-4">
+                  {/* Assistant Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">AI Clinical Assistant</h4>
+                        <span className="text-[10px] text-slate-500 font-bold block">OpenAI Clinical Logic Pipeline</span>
+                      </div>
+                    </div>
+                    <span className="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-900/30 px-2 py-0.5 rounded-full font-bold">
+                      Assistance Only
+                    </span>
+                  </div>
+
+                  {/* Recommendations Display */}
+                  {aiLoading ? (
+                    <div className="py-20 flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                      <span className="text-xs text-slate-400 font-semibold">Formulating custom clinical suggestions...</span>
+                    </div>
+                  ) : aiSuggestions.length === 0 ? (
+                    /* Initial Empty State */
+                    <div className="bg-slate-950/40 border border-slate-850/80 p-5 rounded-2xl text-center space-y-4">
+                      <Activity className="w-10 h-10 text-slate-700 mx-auto" />
+                      <div className="space-y-1">
+                        <h5 className="text-xs font-bold text-slate-350">Clinical Dossier Analysis Standing By</h5>
+                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-xs mx-auto">
+                          Click analyze to prompt the AI model. It will inspect patient demographics, known chronic disease histories, chronic allergies, and proposed medicines to suggest customized lifestyle, diet, and hydration plans.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={generateAISuggestions}
+                        className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 mx-auto active:scale-[0.98]"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Analyze Patient Profile
+                      </button>
+                    </div>
+                  ) : (
+                    /* Active suggestions List */
+                    <div className="space-y-4 animate-in fade-in duration-300">
+                      
+                      {/* Recommendations pills */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">AI Recommended Instructions:</span>
+                        <div className="space-y-1.5">
+                          {aiSuggestions.map((sug, idx) => (
+                            <div
+                              key={idx}
+                              onClick={() => appendInstruction(sug)}
+                              className="bg-indigo-950/20 border border-indigo-900/30 hover:bg-indigo-900/30 hover:border-indigo-800/40 text-indigo-300 px-3 py-2 rounded-xl text-[11px] font-semibold transition cursor-pointer flex items-center justify-between group active:scale-[0.99]"
+                              title="Click to copy into instructions box"
+                            >
+                              <span>• {sug}</span>
+                              <Plus className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition text-indigo-400" />
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-[9px] text-slate-500 block leading-none mt-1">💡 Click any recommendation badge to instantly append it into special instructions.</span>
+                      </div>
+
+                      {/* Clinical Rationale summary */}
+                      <div className="space-y-1.5 bg-slate-950/50 border border-slate-850 p-4.5 rounded-2xl">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">AI Clinical Rationale & Profile Match:</span>
+                        <p className="text-[10.5px] text-slate-450 leading-relaxed font-medium">
+                          {aiSummary}
+                        </p>
+                      </div>
+
+                      {/* Re-analyze Button */}
+                      <button
+                        type="button"
+                        onClick={generateAISuggestions}
+                        className="w-full bg-slate-900 border border-slate-800 hover:bg-slate-850 hover:border-slate-750 text-slate-350 text-[10px] font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        Re-evaluate Proposed EMR Context
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Secure Disclaimer Banner */}
+                <div className="bg-amber-950/20 border border-amber-900/30 text-amber-300 p-4 rounded-2xl text-[10.5px] leading-relaxed flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+                  <div>
+                    <span className="font-bold text-amber-200 block mb-0.5">Physician Clinical Responsibility Disclaimer</span>
+                    AI clinical analysis and health recommendations are provided solely as diagnostic suggestions. The attending licensed physician is solely responsible for confirming EMR data and making all final clinical decisions.
+                  </div>
+                </div>
+
               </div>
 
-              {/* Symptoms Input */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Presented Symptoms *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="E.g., High grade fever, sore throat, cough for 3 days"
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs shadow-inner"
-                />
-              </div>
-
-              {/* Diagnosis Input */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Clinical Diagnosis *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="E.g., Acute Streptococcal Tonsillitis"
-                  value={diagnosis}
-                  onChange={(e) => setDiagnosis(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs shadow-inner"
-                />
-              </div>
-
-              {/* Prescribed Medicines */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Prescribed Medicines (Dosage & Drug) *</label>
-                <textarea
-                  required
-                  rows={2}
-                  placeholder="1. Amoxicillin 500mg (15 Capsules)&#10;2. Paracetamol 650mg (10 Tablets)"
-                  value={medicines}
-                  onChange={(e) => setMedicines(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs resize-none"
-                />
-              </div>
-
-              {/* Intake Instructions */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Special Instructions *</label>
-                <textarea
-                  required
-                  rows={2}
-                  placeholder="Amoxicillin: Take 1 capsule three times daily for 5 days.&#10;Paracetamol: Take 1 tablet every 6 hours as needed for fever."
-                  value={instructions}
-                  onChange={(e) => setInstructions(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 text-xs resize-none"
-                />
-              </div>
-
-              {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
-                <button
-                  type="button"
-                  onClick={() => setPrescribeOpen(false)}
-                  className="px-4 py-2 border border-slate-850 hover:bg-slate-850 text-slate-300 rounded-xl text-xs font-semibold transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  {submitting && <Loader2 className="w-3 animate-spin" />}
-                  Save & Finalize EMR
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

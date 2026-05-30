@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -23,3 +23,17 @@ class PrescriptionResponse(PrescriptionBase):
 
     class Config:
         from_attributes = True
+
+
+class AIRecommendationRequest(BaseModel):
+    patient_id: int = Field(..., description="Target patient ID")
+    symptoms: Optional[str] = Field("", description="Optional currently typed symptoms")
+    diagnosis: Optional[str] = Field("", description="Optional currently typed diagnosis")
+    medicines: Optional[str] = Field("", description="Optional currently typed medicines")
+    instructions: Optional[str] = Field("", description="Optional currently typed instructions")
+
+
+class AIRecommendationResponse(BaseModel):
+    suggestions: List[str] = Field(..., description="List of generated dietary or lifestyle suggestions")
+    summary: str = Field(..., description="AI health warning or patient specific clinical summary analysis")
+
