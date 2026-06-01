@@ -18,7 +18,7 @@ async def poll_scheduled_notifications():
     """
     global _scheduler_running
     logger.info("SMS Notification Scheduler loop starting...")
-    print("⏰ [MedOS Scheduler] Background SMS Reminders Poller is Active!")
+    logger.info("[MedOS Scheduler] Background SMS Reminders Poller is Active!")
     
     while _scheduler_running:
         db = SessionLocal()
@@ -33,7 +33,7 @@ async def poll_scheduled_notifications():
             ).all()
             
             if due_reminders:
-                print(f"⏰ [MedOS Scheduler] Found {len(due_reminders)} pending notifications due for delivery. Processing...")
+                logger.info(f"[MedOS Scheduler] Found {len(due_reminders)} pending notifications due for delivery. Processing...")
                 
             for reminder in due_reminders:
                 try:
@@ -58,7 +58,7 @@ async def poll_scheduled_notifications():
             
             if due_reminders:
                 db.commit()
-                print(f"⏰ [MedOS Scheduler] Successfully processed {len(due_reminders)} reminders.")
+                logger.info(f"[MedOS Scheduler] Successfully processed {len(due_reminders)} reminders.")
                 
         except Exception as ex:
             logger.error(f"Error in scheduler polling loop: {str(ex)}")
@@ -99,4 +99,4 @@ def start_scheduler():
 def stop_scheduler():
     global _scheduler_running
     _scheduler_running = False
-    print("⏰ [MedOS Scheduler] Background SMS Reminders Poller has stopped.")
+    logger.info("[MedOS Scheduler] Background SMS Reminders Poller has stopped.")

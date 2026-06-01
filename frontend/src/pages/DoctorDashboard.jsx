@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Clock, ShieldCheck, Heart, User, Sparkles, Activity, FileText, CheckCircle, X, ChevronRight, ListCollapse, Loader2, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Clock, ShieldCheck, Heart, User, Sparkles, Activity, FileText, CheckCircle, X, ChevronRight, Loader2, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
 
 
 export default function DoctorDashboard() {

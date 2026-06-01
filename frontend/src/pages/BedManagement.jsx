@@ -523,17 +523,17 @@ export default function BedManagement() {
       {/* ------------------- ADMIT PATIENT MODAL FORM ------------------- */}
       {admitOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
               <div className="flex items-center gap-2">
                 <HeartPulse className="w-5 h-5 text-indigo-500" />
-                <h3 className="text-base font-bold text-white">Admit Patient Dossier</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Admit Patient Dossier</h3>
               </div>
               <button
                 onClick={() => setAdmitOpen(false)}
-                className="text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+                className="text-slate-400 hover:text-slate-950 dark:hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -541,7 +541,7 @@ export default function BedManagement() {
 
             {/* Validation Alerts */}
             {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+              <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{validationError}</span>
               </div>
@@ -559,7 +559,7 @@ export default function BedManagement() {
                     placeholder="Search by patient name or phone number..."
                     value={patientSearch}
                     onChange={(e) => setPatientSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
+                    className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
                   />
                 </div>
                 
@@ -615,7 +615,7 @@ export default function BedManagement() {
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
                   >
                     <option value="normal">Normal</option>
                     <option value="urgent">Urgent (Triage)</option>
@@ -629,7 +629,7 @@ export default function BedManagement() {
                     value={roomType}
                     disabled={targetBed !== null}
                     onChange={(e) => setRoomType(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner disabled:opacity-50"
                   >
                     <option value="General">General Ward</option>
                     <option value="ICU">ICU</option>
@@ -640,7 +640,7 @@ export default function BedManagement() {
               </div>
 
               {/* Emergency allotment vs Manual allotment */}
-              <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl space-y-3">
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 p-4 rounded-2xl space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -650,7 +650,7 @@ export default function BedManagement() {
                     className="w-4 h-4 rounded text-indigo-600 bg-slate-900 border-slate-800 focus:ring-indigo-500"
                   />
                   <div>
-                    <span className="font-extrabold text-white text-xs block">Emergency Auto-Allotment</span>
+                    <span className="font-extrabold text-slate-900 dark:text-white text-xs block">Emergency Auto-Allotment</span>
                     <span className="text-[9px] text-slate-450 block mt-0.5">
                       Check this to let the system auto-assign the first vacant bed matching criteria.
                     </span>
@@ -663,7 +663,7 @@ export default function BedManagement() {
                     <select
                       value={manualBedId}
                       onChange={(e) => setManualBedId(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
                     >
                       <option value="">-- Select Vacant Bed --</option>
                       {targetBed && (
@@ -693,12 +693,12 @@ export default function BedManagement() {
                   placeholder="Identify chief medical complaints, clinical symptoms, and initial diagnosis justifying patient admission..."
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-xs resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-xs resize-none"
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-900">
                 <button
                   type="button"
                   onClick={() => setAdmitOpen(false)}
@@ -724,17 +724,17 @@ export default function BedManagement() {
       {/* ------------------- ROOM TRANSFER MODAL FORM ------------------- */}
       {transferOpen && targetAdmission && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
               <div className="flex items-center gap-2">
                 <ArrowLeftRight className="w-5 h-5 text-indigo-500" />
-                <h3 className="text-base font-bold text-white">Execute Patient Room Transfer</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Execute Patient Room Transfer</h3>
               </div>
               <button
                 onClick={() => setTransferOpen(false)}
-                className="text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+                className="text-slate-400 hover:text-slate-950 dark:hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -742,7 +742,7 @@ export default function BedManagement() {
 
             {/* Validation Alerts */}
             {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+              <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{validationError}</span>
               </div>
@@ -751,7 +751,7 @@ export default function BedManagement() {
             <form onSubmit={handleTransferSubmit} className="p-6 space-y-4">
               
               {/* Patient dossier brief */}
-              <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl flex items-center gap-3">
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 p-4 rounded-2xl flex items-center gap-3">
                 <div className="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl">
                   <User className="w-5 h-5" />
                 </div>
@@ -770,7 +770,7 @@ export default function BedManagement() {
                   required
                   value={transferTargetBedId}
                   onChange={(e) => setTransferTargetBedId(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 text-xs shadow-inner"
                 >
                   <option value="">-- Choose New Vacant Bed --</option>
                   {beds
@@ -787,7 +787,7 @@ export default function BedManagement() {
               </div>
 
               {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-900">
                 <button
                   type="button"
                   onClick={() => setTransferOpen(false)}
@@ -813,17 +813,17 @@ export default function BedManagement() {
       {/* ------------------- DISCHARGE PATIENT MODAL FORM ------------------- */}
       {dischargeOpen && targetAdmission && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
               <div className="flex items-center gap-2">
                 <LogOut className="w-5 h-5 text-indigo-500" />
-                <h3 className="text-base font-bold text-white">Discharge Patient & Free Bed</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Discharge Patient & Free Bed</h3>
               </div>
               <button
                 onClick={() => setDischargeOpen(false)}
-                className="text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+                className="text-slate-400 hover:text-slate-950 dark:hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -831,7 +831,7 @@ export default function BedManagement() {
 
             {/* Validation Alerts */}
             {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+              <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{validationError}</span>
               </div>
@@ -840,7 +840,7 @@ export default function BedManagement() {
             <form onSubmit={handleDischargeSubmit} className="p-6 space-y-4">
               
               {/* Patient dossier brief */}
-              <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl flex items-center gap-3">
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 p-4 rounded-2xl flex items-center gap-3">
                 <div className="bg-rose-600/10 text-rose-400 p-2.5 rounded-xl">
                   <User className="w-5 h-5" />
                 </div>
@@ -861,7 +861,7 @@ export default function BedManagement() {
                   placeholder="Outline clinical treatment resolution, follow-up instructions, prescription recovery plan, and final status of the discharged patient..."
                   value={dischargeNotes}
                   onChange={(e) => setDischargeNotes(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-xs resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-xs resize-none"
                 />
                 <span className="text-[9.5px] text-slate-450 block mt-1 leading-snug flex items-center gap-1.5">
                   <Info className="w-3.5 h-3.5 shrink-0 text-indigo-400" />
@@ -870,7 +870,7 @@ export default function BedManagement() {
               </div>
 
               {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-900">
                 <button
                   type="button"
                   onClick={() => setDischargeOpen(false)}

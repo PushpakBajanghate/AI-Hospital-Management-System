@@ -8,6 +8,25 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toasts, setToasts] = useState([]);
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved || 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
 
   const addToast = (message, type = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -92,6 +111,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         error,
         toasts,
+        theme,
+        toggleTheme,
         login,
         register,
         logout,

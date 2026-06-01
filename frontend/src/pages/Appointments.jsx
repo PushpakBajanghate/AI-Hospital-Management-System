@@ -491,14 +491,14 @@ export default function Appointments() {
       {/* ----------------- SCHEDULING BOOKING MODAL ----------------- */}
       {bookingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-              <h3 className="text-base font-bold text-white">Book Clinic Consultation</h3>
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Book Clinic Consultation</h3>
               <button
                 onClick={() => setBookingOpen(false)}
-                className="text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+                className="text-slate-400 hover:text-slate-950 dark:hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -506,7 +506,7 @@ export default function Appointments() {
 
             {/* Validation Alerts */}
             {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+              <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{validationError}</span>
               </div>
@@ -521,7 +521,7 @@ export default function Appointments() {
                   <select
                     value={selectedPatientId}
                     onChange={(e) => setSelectedPatientId(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-xs cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 text-xs cursor-pointer"
                   >
                     {patients.map(pat => (
                       <option key={pat.id} value={pat.id}>{pat.name} (Age: {pat.age})</option>
@@ -534,7 +534,7 @@ export default function Appointments() {
                   <select
                     value={selectedDoctorId}
                     onChange={(e) => setSelectedDoctorId(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-xs cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 text-xs cursor-pointer"
                   >
                     {doctors.map(doc => (
                       <option key={doc.id} value={doc.id}>{doc.full_name}</option>
@@ -551,7 +551,7 @@ export default function Appointments() {
                   required
                   value={appointmentDate}
                   onChange={(e) => setAppointmentDate(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-xs shadow-inner"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 text-xs shadow-inner"
                 />
               </div>
 
@@ -577,10 +577,10 @@ export default function Appointments() {
                           onClick={() => setSelectedSlot(slot)}
                           className={`py-2 rounded-xl text-[10px] font-bold border transition text-center ${
                             isBooked
-                              ? 'bg-rose-950/20 border-rose-900/30 text-rose-500/50 cursor-not-allowed'
+                              ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 cursor-not-allowed'
                               : isSelected
                               ? 'bg-blue-600 border-blue-500 text-white shadow-md'
-                              : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-900'
+                              : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-850 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900'
                           }`}
                         >
                           {slot}
@@ -600,16 +600,16 @@ export default function Appointments() {
                   placeholder="Routine cardiovascular check-up, headache follow-up, etc."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs resize-none"
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-900">
                 <button
                   type="button"
                   onClick={() => setBookingOpen(false)}
-                  className="px-4 py-2 border border-slate-850 hover:bg-slate-850 text-slate-300 rounded-xl text-xs font-semibold transition"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
@@ -630,14 +630,14 @@ export default function Appointments() {
       {/* ----------------- RESCHEDULING MODAL OVERLAY ----------------- */}
       {rescheduleOpen && targetAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-              <h3 className="text-base font-bold text-white">Reschedule Appointment</h3>
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Reschedule Appointment</h3>
               <button
                 onClick={() => setRescheduleOpen(false)}
-                className="text-slate-400 hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
+                className="text-slate-400 hover:text-slate-950 dark:hover:text-white transition p-1 hover:bg-slate-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -645,7 +645,7 @@ export default function Appointments() {
 
             {/* Validation Alerts */}
             {validationError && (
-              <div className="mx-6 mt-4 p-3.5 bg-rose-950/40 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
+              <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{validationError}</span>
               </div>
@@ -655,12 +655,12 @@ export default function Appointments() {
               
               <div className="space-y-1">
                 <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Patient</span>
-                <span className="text-xs font-semibold text-white block">{targetAppointment.patient?.name}</span>
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">{targetAppointment.patient?.name}</span>
               </div>
 
               <div className="space-y-1">
                 <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Practitioner</span>
-                <span className="text-xs font-semibold text-white block">{targetAppointment.doctor?.full_name}</span>
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">{targetAppointment.doctor?.full_name}</span>
               </div>
 
               {/* Select Date */}
@@ -671,7 +671,7 @@ export default function Appointments() {
                   required
                   value={appointmentDate}
                   onChange={(e) => setAppointmentDate(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-xs shadow-inner"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 text-xs shadow-inner"
                 />
               </div>
 
@@ -697,10 +697,10 @@ export default function Appointments() {
                           onClick={() => setSelectedSlot(slot)}
                           className={`py-2 rounded-xl text-[10px] font-bold border transition text-center ${
                             isBooked
-                              ? 'bg-rose-950/20 border-rose-900/30 text-rose-500/50 cursor-not-allowed'
+                              ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 cursor-not-allowed'
                               : isSelected
                               ? 'bg-blue-600 border-blue-500 text-white shadow-md'
-                              : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-900'
+                              : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-850 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900'
                           }`}
                         >
                           {slot}
@@ -713,11 +713,11 @@ export default function Appointments() {
               </div>
 
               {/* Submit Buttons */}
-              <div className="pt-4 border-t border-slate-800 flex gap-3 justify-end bg-slate-900">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-900">
                 <button
                   type="button"
                   onClick={() => setRescheduleOpen(false)}
-                  className="px-4 py-2 border border-slate-850 hover:bg-slate-850 text-slate-300 rounded-xl text-xs font-semibold transition"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
