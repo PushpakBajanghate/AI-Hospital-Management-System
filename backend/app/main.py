@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from app.core.config import settings
+from app.core.config import parse_cors, settings
 from app.core.database import get_db, engine
 from app.models.base import Base
 from app.api.v1.api import api_router
@@ -72,7 +72,9 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin).strip("/") for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=[
+            str(origin).strip("/") for origin in parse_cors(settings.BACKEND_CORS_ORIGINS)
+        ],
         allow_origin_regex=settings.BACKEND_CORS_ORIGIN_REGEX,
         allow_credentials=True,
         allow_methods=["*"],

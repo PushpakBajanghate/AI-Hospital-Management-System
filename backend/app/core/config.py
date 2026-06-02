@@ -1,7 +1,6 @@
 from typing import List, Union, Optional
-from pydantic import AnyHttpUrl, BeforeValidator, Field
+from pydantic import AnyHttpUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing_extensions import Annotated
 
 
 def parse_cors(v: Union[str, List[str]]) -> List[str]:
@@ -22,14 +21,12 @@ class Settings(BaseSettings):
     ENV: str = "development"
 
     # CORS origins can be overridden with BACKEND_CORS_ORIGINS in production.
-    BACKEND_CORS_ORIGINS: Annotated[
-        List[str], BeforeValidator(parse_cors)
-    ] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://localhost:3000",
-    ]
+    BACKEND_CORS_ORIGINS: str = (
+        "http://localhost:5173,"
+        "http://127.0.0.1:5173,"
+        "http://localhost:5174,"
+        "http://localhost:3000"
+    )
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = r"https://.*\.vercel\.app"
 
     # Database
