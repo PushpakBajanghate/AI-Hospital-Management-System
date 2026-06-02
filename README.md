@@ -5,31 +5,31 @@
 ## The system helps hospitals manage:
 
 ## Patient Registration
-Appointment Booking
-Electronic Medical Records (EMR)
-Doctor Consultations
-Bed Allocation & Admissions
-Billing & Insurance
-Telemedicine
-AI-Powered Health Recommendations
-SMS Notifications
+* Appointment Booking
+* Electronic Medical Records (EMR)
+* Doctor Consultations
+* Bed Allocation & Admissions
+* Billing & Insurance
+* Telemedicine
+* AI-Powered Health Recommendations
+* SMS Notifications
 
-## Built using React, FastAPI, PostgreSQL, and OpenAI APIs, MedOS provides a clean and scalable solution for managing day-to-day hospital workflows from a single platform. The system is designed with role-based access control, secure authentication, and an intuitive dashboard to improve efficiency for administrators, doctors, receptionists, and patients.
+Built using React, FastAPI, PostgreSQL, and OpenAI APIs, MedOS provides a clean and scalable solution for managing day-to-day hospital workflows from a single platform. The system is designed with role-based access control, secure authentication, and an intuitive dashboard to improve efficiency for administrators, doctors, receptionists, and patients.
 
 ## ✨ Key Features
-Secure JWT Authentication & Role-Based Access
-Patient Registration & Digital Medical Records
-Appointment Scheduling & Management
-Doctor Dashboard & Prescription Management
-Smart Bed Allocation & Admission Tracking
-Billing & Insurance Management
-AI-Assisted Health Recommendations
-Telemedicine Support
-SMS Notifications & Appointment Reminders
-Responsive and Modern Healthcare Dashboard
-🎯 Project Goal
+* Secure JWT Authentication & Role-Based Access
+* Patient Registration & Digital Medical Records
+* Appointment Scheduling & Management
+* Doctor Dashboard & Prescription Management
+* Smart Bed Allocation & Admission Tracking
+* Billing & Insurance Management
+* AI-Assisted Health Recommendations
+* Telemedicine Support
+* SMS Notifications & Appointment Reminders
+* Responsive and Modern Healthcare Dashboard
+## 🎯 Project Goal
 
-## The goal of MedOS is to reduce manual hospital operations, improve patient experience, and demonstrate the practical use of AI, full-stack development, and healthcare workflow automation in a real-world application.
+The goal of MedOS is to reduce manual hospital operations, improve patient experience, and demonstrate the practical use of AI, full-stack development, and healthcare workflow automation in a real-world application.
 
 ## 🛠️ Technology Stack
 
