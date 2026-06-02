@@ -18,6 +18,7 @@ import {
   Info
 } from 'lucide-react';
 import safeLocalStorage from '../services/storage';
+import PatientChatbot from '../components/PatientChatbot';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -350,6 +351,9 @@ export default function Login() {
           </div>
         </div>
       )}
+
+      {/* AI Patient Chatbot Assistant — accessible before login */}
+      <PatientChatbot />
     </div>
   );
 }

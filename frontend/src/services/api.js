@@ -2,11 +2,15 @@ import axios from 'axios';
 import safeLocalStorage from './storage';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  // Use empty baseURL so requests go through the Vite proxy (same origin).
+  // This eliminates all CORS issues in standard/normal browser windows.
+  // The Vite dev server proxies /api/* → http://localhost:8000
+  baseURL: import.meta.env.VITE_API_URL || '',
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
 
 // Request interceptor to attach authentication token
 api.interceptors.request.use(

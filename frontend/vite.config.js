@@ -13,5 +13,15 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    // Proxy all /api calls to the backend — this eliminates CORS entirely
+    // because the browser sees all requests coming from the same origin (localhost:5173)
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   }
 })
+
