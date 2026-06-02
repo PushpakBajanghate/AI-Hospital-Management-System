@@ -360,7 +360,7 @@ const LayoutShell = ({ children }) => {
                 <span className="font-black text-slate-950 dark:text-white">MedOS Secure</span>
               </div>
               <button onClick={() => setMobileOpen(false)} className="p-1 hover:bg-slate-100 rounded-xl dark:hover:bg-slate-800">
-                <X className="w-5 h-5" text-slate-400 />
+                <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
 

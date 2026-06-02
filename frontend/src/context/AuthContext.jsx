@@ -3,13 +3,39 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
+// Safe wrapper for localStorage to handle restrictive private/incognito browser settings
+const safeLocalStorage = {
+  getItem: (key) => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage is not accessible:", e);
+      return null;
+    }
+  },
+  setItem: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage is not accessible:", e);
+    }
+  },
+  removeItem: (key) => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn("localStorage is not accessible:", e);
+    }
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme');
+    const saved = safeLocalStorage.getItem('theme');
     return saved || 'light';
   });
 
@@ -20,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
+    safeLocalStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -40,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   // Re-authenticate user session on mount
   useEffect(() => {
     const bootstrapAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = safeLocalStorage.getItem('token');
       if (token) {
         try {
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -62,7 +88,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/api/v1/auth/login/json', { email, password });
       const { access_token, role, name } = response.data;
       
-      localStorage.setItem('token', access_token);
+      safeLocalStorage.setItem('token', access_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       // Fetch fresh profile details
@@ -98,7 +124,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    safeLocalStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
     addToast('Signed out of MedOS secure console.', 'info');

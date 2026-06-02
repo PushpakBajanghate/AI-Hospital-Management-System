@@ -39,10 +39,14 @@ export default function Login() {
 
   // Load saved email if rememberMe was active
   useEffect(() => {
-    const saved = localStorage.getItem('savedEmail');
-    if (saved) {
-      setEmail(saved);
-      setRememberMe(true);
+    try {
+      const saved = localStorage.getItem('savedEmail');
+      if (saved) {
+        setEmail(saved);
+        setRememberMe(true);
+      }
+    } catch (e) {
+      console.warn("localStorage is not accessible:", e);
     }
   }, []);
 
@@ -60,10 +64,14 @@ export default function Login() {
     setSubmitting(true);
     try {
       await login(email, password);
-      if (rememberMe) {
-        localStorage.setItem('savedEmail', email);
-      } else {
-        localStorage.removeItem('savedEmail');
+      try {
+        if (rememberMe) {
+          localStorage.setItem('savedEmail', email);
+        } else {
+          localStorage.removeItem('savedEmail');
+        }
+      } catch (e) {
+        console.warn("localStorage is not accessible:", e);
       }
       navigate(destination, { replace: true });
     } catch (err) {
