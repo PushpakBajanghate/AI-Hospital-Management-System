@@ -49,6 +49,7 @@ import api from './services/api';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const [admissions, setAdmissions] = useState([]);
   const [appointmentsCount, setAppointmentsCount] = useState(0);
   const [patientsCount, setPatientsCount] = useState(0);
@@ -134,7 +135,7 @@ const Dashboard = () => {
               Access Patients Ledger
             </button>
             <a
-              href="http://localhost:8000/docs"
+              href={`${apiBaseUrl}/docs`}
               target="_blank"
               rel="noreferrer"
               className="bg-slate-800/80 border border-slate-700/85 hover:bg-slate-700/80 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5"

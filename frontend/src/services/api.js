@@ -2,9 +2,8 @@ import axios from 'axios';
 import safeLocalStorage from './storage';
 
 const api = axios.create({
-  // Use empty baseURL so requests go through the Vite proxy (same origin).
-  // This eliminates all CORS issues in standard/normal browser windows.
-  // The Vite dev server proxies /api/* → http://localhost:8000
+  // In production, Vercel injects VITE_API_URL with the Render backend URL.
+  // Locally, an empty baseURL lets Vite proxy /api/* to http://localhost:8000.
   baseURL: import.meta.env.VITE_API_URL || '',
   headers: {
     'Content-Type': 'application/json',
