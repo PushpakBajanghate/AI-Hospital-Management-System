@@ -3,31 +3,7 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
-// Safe wrapper for localStorage to handle restrictive private/incognito browser settings
-const safeLocalStorage = {
-  getItem: (key) => {
-    try {
-      return localStorage.getItem(key);
-    } catch (e) {
-      console.warn("localStorage is not accessible:", e);
-      return null;
-    }
-  },
-  setItem: (key, value) => {
-    try {
-      localStorage.setItem(key, value);
-    } catch (e) {
-      console.warn("localStorage is not accessible:", e);
-    }
-  },
-  removeItem: (key) => {
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      console.warn("localStorage is not accessible:", e);
-    }
-  }
-};
+import safeLocalStorage from '../services/storage';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

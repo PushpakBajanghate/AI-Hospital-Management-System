@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import safeLocalStorage from '../services/storage';
 import { useAuth } from '../context/AuthContext';
 import { 
   CreditCard, 
@@ -52,7 +53,7 @@ export default function Billing() {
       const patientRes = await api.get('/api/v1/patients/');
       setPatients(patientRes.data);
 
-      const localInvoices = localStorage.getItem('medos_invoices');
+      const localInvoices = safeLocalStorage.getItem('medos_invoices');
       if (localInvoices) {
         setInvoices(JSON.parse(localInvoices));
       } else {
@@ -86,7 +87,7 @@ export default function Billing() {
           }
         ];
         setInvoices(seeded);
-        localStorage.setItem('medos_invoices', JSON.stringify(seeded));
+        safeLocalStorage.setItem('medos_invoices', JSON.stringify(seeded));
       }
     } catch (err) {
       console.error(err);
@@ -140,7 +141,7 @@ export default function Billing() {
     setTimeout(() => {
       const updated = [newInvoice, ...invoices];
       setInvoices(updated);
-      localStorage.setItem('medos_invoices', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_invoices', JSON.stringify(updated));
       setSubmitting(false);
       setModalOpen(false);
       addToast(`Invoice ${newInvoice.id} generated successfully!`, 'success');
@@ -163,7 +164,7 @@ export default function Billing() {
       return inv;
     });
     setInvoices(updated);
-    localStorage.setItem('medos_invoices', JSON.stringify(updated));
+    safeLocalStorage.setItem('medos_invoices', JSON.stringify(updated));
     if (activeInvoice && activeInvoice.id === invoiceId) {
       setActiveInvoice({ ...activeInvoice, status: 'paid' });
     }
@@ -174,7 +175,7 @@ export default function Billing() {
     if (window.confirm(`Are you sure you want to void and delete invoice ${invoiceId}?`)) {
       const updated = invoices.filter(inv => inv.id !== invoiceId);
       setInvoices(updated);
-      localStorage.setItem('medos_invoices', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_invoices', JSON.stringify(updated));
       if (activeInvoice && activeInvoice.id === invoiceId) {
         setActiveInvoice(null);
       }

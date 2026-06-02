@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import safeLocalStorage from '../services/storage';
 import { 
   ShieldCheck, 
   Plus, 
@@ -49,7 +50,7 @@ export default function Insurance() {
       const patientRes = await api.get('/api/v1/patients/');
       setPatients(patientRes.data);
 
-      const localClaims = localStorage.getItem('medos_claims');
+      const localClaims = safeLocalStorage.getItem('medos_claims');
       if (localClaims) {
         setClaims(JSON.parse(localClaims));
       } else {
@@ -80,7 +81,7 @@ export default function Insurance() {
           }
         ];
         setClaims(seededClaims);
-        localStorage.setItem('medos_claims', JSON.stringify(seededClaims));
+        safeLocalStorage.setItem('medos_claims', JSON.stringify(seededClaims));
       }
     } catch (err) {
       console.error(err);
@@ -128,7 +129,7 @@ export default function Insurance() {
     setTimeout(() => {
       const updated = [newClaim, ...claims];
       setClaims(updated);
-      localStorage.setItem('medos_claims', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_claims', JSON.stringify(updated));
       setSubmitting(false);
       setModalOpen(false);
       addToast(`Claim ${newClaim.id} successfully compiled and dispatched to provider!`, 'success');
@@ -150,7 +151,7 @@ export default function Insurance() {
       return cl;
     });
     setClaims(updated);
-    localStorage.setItem('medos_claims', JSON.stringify(updated));
+    safeLocalStorage.setItem('medos_claims', JSON.stringify(updated));
     if (activeClaim && activeClaim.id === claimId) {
       setActiveClaim({ ...activeClaim, status: newStatus });
     }
@@ -161,7 +162,7 @@ export default function Insurance() {
     if (window.confirm(`Are you absolutely sure you want to retract claim ${claimId}?`)) {
       const updated = claims.filter(cl => cl.id !== claimId);
       setClaims(updated);
-      localStorage.setItem('medos_claims', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_claims', JSON.stringify(updated));
       if (activeClaim && activeClaim.id === claimId) {
         setActiveClaim(null);
       }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import safeLocalStorage from '../services/storage';
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -49,7 +50,7 @@ export default function Settings() {
     setTimeout(() => {
       setConfiguring(false);
       addToast('Hospital pricing and clinical configurations saved.', 'success');
-      localStorage.setItem('medos_ai_simulation', aiSimulation.toString());
+      safeLocalStorage.setItem('medos_ai_simulation', aiSimulation.toString());
     }, 800);
   };
 

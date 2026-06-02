@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import safeLocalStorage from '../services/storage';
 import { useAuth } from '../context/AuthContext';
 import { 
   Video, 
@@ -59,7 +60,7 @@ export default function Telemedicine() {
       const patientRes = await api.get('/api/v1/patients/');
       setPatients(patientRes.data);
 
-      const localSessions = localStorage.getItem('medos_virtual_consults');
+      const localSessions = safeLocalStorage.getItem('medos_virtual_consults');
       if (localSessions) {
         setSessions(JSON.parse(localSessions));
       } else {
@@ -84,7 +85,7 @@ export default function Telemedicine() {
           }
         ];
         setSessions(seededSessions);
-        localStorage.setItem('medos_virtual_consults', JSON.stringify(seededSessions));
+        safeLocalStorage.setItem('medos_virtual_consults', JSON.stringify(seededSessions));
       }
     } catch (err) {
       console.error(err);
@@ -130,7 +131,7 @@ export default function Telemedicine() {
     setTimeout(() => {
       const updated = [newSession, ...sessions];
       setSessions(updated);
-      localStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
       setSubmitting(false);
       setModalOpen(false);
       addToast(`Virtual Consultation ${newSession.id} successfully scheduled!`, 'success');
@@ -166,7 +167,7 @@ export default function Telemedicine() {
       return se;
     });
     setSessions(updated);
-    localStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
+    safeLocalStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
 
     addToast(`Telemedicine consult ${activeSession.id} closed. Consultation logged.`, 'info');
     setActiveSession(null);
@@ -205,7 +206,7 @@ export default function Telemedicine() {
     if (window.confirm('Are you sure you want to cancel this scheduled telemedicine appointment?')) {
       const updated = sessions.filter(se => se.id !== id);
       setSessions(updated);
-      localStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
+      safeLocalStorage.setItem('medos_virtual_consults', JSON.stringify(updated));
       addToast('Virtual appointment cancelled.', 'success');
     }
   };

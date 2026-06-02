@@ -17,6 +17,7 @@ import {
   Moon,
   Info
 } from 'lucide-react';
+import safeLocalStorage from '../services/storage';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -39,14 +40,10 @@ export default function Login() {
 
   // Load saved email if rememberMe was active
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('savedEmail');
-      if (saved) {
-        setEmail(saved);
-        setRememberMe(true);
-      }
-    } catch (e) {
-      console.warn("localStorage is not accessible:", e);
+    const saved = safeLocalStorage.getItem('savedEmail');
+    if (saved) {
+      setEmail(saved);
+      setRememberMe(true);
     }
   }, []);
 
@@ -64,14 +61,10 @@ export default function Login() {
     setSubmitting(true);
     try {
       await login(email, password);
-      try {
-        if (rememberMe) {
-          localStorage.setItem('savedEmail', email);
-        } else {
-          localStorage.removeItem('savedEmail');
-        }
-      } catch (e) {
-        console.warn("localStorage is not accessible:", e);
+      if (rememberMe) {
+        safeLocalStorage.setItem('savedEmail', email);
+      } else {
+        safeLocalStorage.removeItem('savedEmail');
       }
       navigate(destination, { replace: true });
     } catch (err) {
