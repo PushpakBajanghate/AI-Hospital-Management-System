@@ -11,6 +11,20 @@ from app.api.v1.api import api_router
 # Auto-generate DB tables
 Base.metadata.create_all(bind=engine)
 
+def seed_users(db: Session):
+    from app.models.user import User
+    from app.core import security
+    if db.query(User).count() == 0:
+        db.add(User(
+            email="ritesh@gmail.com",
+            hashed_password=security.get_password_hash("password123"),
+            full_name="Dr. Ritesh",
+            role="doctor",
+            is_active=True
+        ))
+        db.commit()
+        print("Successfully seeded default doctor: ritesh@gmail.com / password123")
+
 def seed_beds(db: Session):
     from app.models.bed import Bed
     # Check if we have any beds
@@ -50,6 +64,7 @@ def startup_event():
     from app.core.database import SessionLocal
     db = SessionLocal()
     try:
+        seed_users(db)
         seed_beds(db)
     finally:
         db.close()

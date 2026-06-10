@@ -93,70 +93,8 @@ export default function Login() {
   return (
     <div className="min-h-screen w-screen flex bg-slate-50 dark:bg-slate-950 font-sans overflow-hidden relative transition-colors duration-300">
       
-      {/* ----------------- LEFT PANEL: EXPERIENCE & BRANDING ----------------- */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-950 via-slate-900 to-cyan-950 p-16 flex-col justify-between relative overflow-hidden border-r border-slate-200 dark:border-slate-900 select-none">
-        
-        {/* Glowing glassmorphic circles */}
-        <div className="absolute top-[-20%] left-[-15%] w-[700px] h-[700px] bg-blue-600/10 rounded-full blur-[130px] pointer-events-none animate-pulse duration-[8000ms]"></div>
-        <div className="absolute bottom-[-20%] right-[-15%] w-[700px] h-[700px] bg-teal-500/10 rounded-full blur-[130px] pointer-events-none animate-pulse duration-[10000ms]"></div>
-
-        {/* Mesh Grid Overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:5rem_5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-30"></div>
-
-        {/* Branding header */}
-        <div className="flex items-center gap-3 relative z-10 animate-in fade-in duration-700">
-          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white shadow-xl shadow-blue-500/30 ring-1 ring-white/10">
-            <Activity className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <span className="font-black text-white text-xl tracking-tight block">MedOS</span>
-            <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block mt-0.5">AI Clinical Intelligence</span>
-          </div>
-        </div>
-
-        {/* Center Floating Glass Panel */}
-        <div className="my-auto relative z-10 animate-in slide-in-from-left-8 duration-1000">
-          <div className="bg-slate-900/40 border border-white/10 backdrop-blur-3xl rounded-[32px] p-8 max-w-md shadow-2xl relative">
-            <div className="absolute -top-3.5 -right-3.5 bg-gradient-to-tr from-cyan-400 to-blue-500 text-slate-950 p-2 rounded-2xl shadow-xl shadow-cyan-400/20">
-              <Sparkles className="w-4 h-4 animate-spin-slow text-slate-950" />
-            </div>
-            
-            <span className="bg-blue-500/15 text-blue-300 border border-blue-500/30 text-[9px] font-bold uppercase px-3 py-1 rounded-full tracking-wider inline-block">
-              Clinical Core Intelligence
-            </span>
-            <h2 className="text-3xl font-extrabold text-white mt-4 leading-tight tracking-tight">
-              Augmented Diagnostics & Patient Flow
-            </h2>
-            <p className="text-slate-350 mt-3 text-sm leading-relaxed font-medium">
-              Empowering healthcare facilities with deep clinical indexing, predictive appointment queues, and structured electronic health files (EHR).
-            </p>
-
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-800/40">
-              <div>
-                <span className="text-slate-500 text-[9px] uppercase font-bold tracking-wider">Queue Latency</span>
-                <span className="text-white font-extrabold block text-lg mt-0.5">18.4ms avg</span>
-              </div>
-              <div>
-                <span className="text-slate-500 text-[9px] uppercase font-bold tracking-wider">Classification</span>
-                <span className="text-white font-extrabold block text-lg mt-0.5">99.86% Accurate</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-slate-500 relative z-10 font-medium">
-          <span className="flex items-center gap-1.5">
-            <Heart className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-            Validated Medical Safety Standards
-          </span>
-          <span>Security AES-256</span>
-        </div>
-      </div>
-
-      {/* ----------------- RIGHT PANEL: AUTHENTICATION FORM ----------------- */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-slate-50 dark:bg-slate-950 relative overflow-y-auto min-h-screen transition-colors duration-300">
+      {/* ----------------- AUTHENTICATION FORM ----------------- */}
+      <div className="w-full flex items-center justify-center p-6 sm:p-12 bg-slate-50 dark:bg-slate-950 relative overflow-y-auto min-h-screen transition-colors duration-300">
         
         {/* Floating Theme Switcher top right */}
         <button
@@ -173,18 +111,13 @@ export default function Login() {
 
         <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 backdrop-blur-2xl rounded-[32px] p-8 sm:p-10 shadow-xl dark:shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
           
-          {/* Mobile Header Branding */}
-          <div className="flex flex-col items-center mb-8 lg:hidden">
-            <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl text-white mb-3 shadow-lg shadow-blue-500/25">
-              <Activity className="w-6 h-6 animate-pulse" />
+          {/* Header Branding */}
+          <div className="flex flex-col items-center mb-8 text-center">
+            <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-3 rounded-2xl text-white mb-4 shadow-lg shadow-blue-500/25">
+              <Activity className="w-7 h-7 animate-pulse" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">MedOS Secure Portal</h2>
-          </div>
-
-          {/* Desktop Header */}
-          <div className="hidden lg:block mb-8">
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Access Secure Console</h1>
-            <p className="text-slate-550 mt-3 text-sm leading-relaxed font-medium dark:text-slate-400">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">MedOS Secure Portal</h2>
+            <p className="text-slate-550 text-sm leading-relaxed font-medium dark:text-slate-400">
               Enter your clinical credentials to authenticate your connection to the MedOS medical control panels.
             </p>
           </div>
