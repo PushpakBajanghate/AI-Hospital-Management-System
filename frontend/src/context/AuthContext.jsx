@@ -73,7 +73,14 @@ export const AuthProvider = ({ children }) => {
       addToast(`Welcome back, ${profileResponse.data.full_name || 'User'}!`, 'success');
       return profileResponse.data;
     } catch (err) {
-      const errMsg = err.response?.data?.detail || 'Login failed. Please check your credentials.';
+      let errMsg = 'Login failed. Please check your credentials.';
+      if (err.response?.data?.detail) {
+        if (Array.isArray(err.response.data.detail)) {
+          errMsg = err.response.data.detail.map(e => e.msg).join(', ');
+        } else {
+          errMsg = err.response.data.detail;
+        }
+      }
       setError(errMsg);
       addToast(errMsg, 'error');
       throw new Error(errMsg);
@@ -92,7 +99,14 @@ export const AuthProvider = ({ children }) => {
       addToast('Profile successfully registered! Redirecting...', 'success');
       return response.data;
     } catch (err) {
-      const errMsg = err.response?.data?.detail || 'Registration failed. Try again.';
+      let errMsg = 'Registration failed. Try again.';
+      if (err.response?.data?.detail) {
+        if (Array.isArray(err.response.data.detail)) {
+          errMsg = err.response.data.detail.map(e => e.msg).join(', ');
+        } else {
+          errMsg = err.response.data.detail;
+        }
+      }
       setError(errMsg);
       addToast(errMsg, 'error');
       throw new Error(errMsg);
