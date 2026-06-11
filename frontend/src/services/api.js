@@ -13,7 +13,9 @@ const shouldUseConfiguredApiUrl =
 
 export const API_BASE_URL = (
   shouldUseConfiguredApiUrl ||
-  ''
+  (import.meta.env.PROD && !isLocalHost
+    ? 'https://ai-hospital-backend.onrender.com'
+    : '')
 ).replace(/\/$/, '');
 
 const api = axios.create({
