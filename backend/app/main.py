@@ -8,45 +8,49 @@ from app.core.database import get_db, engine
 from app.models.base import Base
 from app.api.v1.api import api_router
 
-# Auto-generate DB tables
-Base.metadata.create_all(bind=engine)
 
 def seed_users(db: Session):
     from app.models.user import User
     from app.core import security
-    default_email = "ritesh@gmail.com"
-    default_password = "password123"
-    default_name = "Dr. Ritesh"
+    demo_users = [
+        {
+            "email": "demo@medos.com",
+            "password": "Demo@12345",
+            "full_name": "Dr. Demo User",
+            "role": "doctor",
+        }
+    ]
 
-    user = db.query(User).filter(User.email == default_email).first()
-    if not user:
-        db.add(User(
-            email=default_email,
-            hashed_password=security.get_password_hash(default_password),
-            full_name=default_name,
-            role="doctor",
-            is_active=True
-        ))
-        db.commit()
-        print(f"Successfully seeded default doctor: {default_email} / {default_password}")
-        return
+    for demo in demo_users:
+        user = db.query(User).filter(User.email == demo["email"]).first()
+        if not user:
+            db.add(User(
+                email=demo["email"],
+                hashed_password=security.get_password_hash(demo["password"]),
+                full_name=demo["full_name"],
+                role=demo["role"],
+                is_active=True
+            ))
+            db.commit()
+            print(f"Successfully seeded demo login: {demo['email']} / {demo['password']}")
+            continue
 
-    changed = False
-    if not security.verify_password(default_password, user.hashed_password):
-        user.hashed_password = security.get_password_hash(default_password)
-        changed = True
-    if user.full_name != default_name:
-        user.full_name = default_name
-        changed = True
-    if user.role != "doctor":
-        user.role = "doctor"
-        changed = True
-    if not user.is_active:
-        user.is_active = True
-        changed = True
-    if changed:
-        db.commit()
-        print(f"Updated default doctor login: {default_email} / {default_password}")
+        changed = False
+        if not security.verify_password(demo["password"], user.hashed_password):
+            user.hashed_password = security.get_password_hash(demo["password"])
+            changed = True
+        if user.full_name != demo["full_name"]:
+            user.full_name = demo["full_name"]
+            changed = True
+        if user.role != demo["role"]:
+            user.role = demo["role"]
+            changed = True
+        if not user.is_active:
+            user.is_active = True
+            changed = True
+        if changed:
+            db.commit()
+            print(f"Updated demo login: {demo['email']} / {demo['password']}")
 
 def seed_beds(db: Session):
     from app.models.bed import Bed
@@ -84,6 +88,23 @@ app = FastAPI(
 
 @app.on_event("startup")
 def startup_event():
+    import os
+    import shutil
+
+    if os.environ.get("VERCEL") == "1":
+        # Copy the pre-populated SQLite DB to /tmp/ if it doesn't exist
+        db_source = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "hospital.db")
+        db_target = "/tmp/hospital.db"
+        if os.path.exists(db_source) and not os.path.exists(db_target):
+            try:
+                shutil.copy2(db_source, db_target)
+            except Exception as e:
+                print(f"Error copying DB: {e}")
+
+    from app.core.database import engine
+    from app.models.base import Base
+    Base.metadata.create_all(bind=engine)
+
     from app.core.database import SessionLocal
     db = SessionLocal()
     try:
