@@ -1,10 +1,27 @@
 import axios from 'axios';
 import safeLocalStorage from './storage';
 
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const isBrowser = typeof window !== 'undefined';
+const isLocalHost =
+  isBrowser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const isLocalApiUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(
+  configuredApiUrl || ''
+);
+const shouldUseConfiguredApiUrl =
+  configuredApiUrl && !(import.meta.env.PROD && !isLocalHost && isLocalApiUrl);
+
+export const API_BASE_URL = (
+  shouldUseConfiguredApiUrl ||
+  (import.meta.env.PROD && !isLocalHost
+    ? 'https://ai-hospital-backend.onrender.com'
+    : '')
+).replace(/\/$/, '');
+
 const api = axios.create({
   // In production, Vercel injects VITE_API_URL with the Render backend URL.
   // Locally, an empty baseURL lets Vite proxy /api/* to http://localhost:8000.
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

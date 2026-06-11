@@ -43,13 +43,13 @@ import Insurance from './pages/Insurance';
 import Telemedicine from './pages/Telemedicine';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
-import api from './services/api';
+import api, { API_BASE_URL } from './services/api';
 
 // Dashboard View for general staff or admins (Doctors get redirected to DoctorDashboard)
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const apiBaseUrl = API_BASE_URL || 'http://localhost:8000';
   const [admissions, setAdmissions] = useState([]);
   const [appointmentsCount, setAppointmentsCount] = useState(0);
   const [patientsCount, setPatientsCount] = useState(0);

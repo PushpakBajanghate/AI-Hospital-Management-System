@@ -14,16 +14,39 @@ Base.metadata.create_all(bind=engine)
 def seed_users(db: Session):
     from app.models.user import User
     from app.core import security
-    if db.query(User).count() == 0:
+    default_email = "ritesh@gmail.com"
+    default_password = "password123"
+    default_name = "Dr. Ritesh"
+
+    user = db.query(User).filter(User.email == default_email).first()
+    if not user:
         db.add(User(
-            email="ritesh@gmail.com",
-            hashed_password=security.get_password_hash("password123"),
-            full_name="Dr. Ritesh",
+            email=default_email,
+            hashed_password=security.get_password_hash(default_password),
+            full_name=default_name,
             role="doctor",
             is_active=True
         ))
         db.commit()
-        print("Successfully seeded default doctor: ritesh@gmail.com / password123")
+        print(f"Successfully seeded default doctor: {default_email} / {default_password}")
+        return
+
+    changed = False
+    if not security.verify_password(default_password, user.hashed_password):
+        user.hashed_password = security.get_password_hash(default_password)
+        changed = True
+    if user.full_name != default_name:
+        user.full_name = default_name
+        changed = True
+    if user.role != "doctor":
+        user.role = "doctor"
+        changed = True
+    if not user.is_active:
+        user.is_active = True
+        changed = True
+    if changed:
+        db.commit()
+        print(f"Updated default doctor login: {default_email} / {default_password}")
 
 def seed_beds(db: Session):
     from app.models.bed import Bed

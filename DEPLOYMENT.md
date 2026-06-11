@@ -56,6 +56,9 @@ It should return a healthy API response.
 | --- | --- |
 | `VITE_API_URL` | Your Render backend URL, for example `https://your-render-service.onrender.com` |
 
+If this variable is omitted, the frontend falls back to the Render service name in
+`render.yaml`: `https://ai-hospital-backend.onrender.com`.
+
 4. Deploy.
 
 The frontend includes `frontend/vercel.json`, so refreshing nested React routes works in any browser.
