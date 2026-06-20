@@ -2,31 +2,20 @@ import axios from 'axios';
 import safeLocalStorage from './storage';
 
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
-const isBrowser = typeof window !== 'undefined';
-const isLocalHost =
-  isBrowser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
-const isLocalApiUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(
-  configuredApiUrl || ''
-);
-const shouldUseConfiguredApiUrl =
-  configuredApiUrl && !(import.meta.env.PROD && !isLocalHost && isLocalApiUrl);
-
-export const API_BASE_URL = (
-  shouldUseConfiguredApiUrl ||
-  (import.meta.env.PROD && !isLocalHost
-    ? 'https://ai-hospital-backend.onrender.com'
-    : '')
-).replace(/\/$/, '');
+export const API_BASE_URL = (configuredApiUrl || '').replace(/\/$/, '');
 
 const api = axios.create({
-  // In production, Vercel injects VITE_API_URL with the Render backend URL.
-  // Locally, an empty baseURL lets Vite proxy /api/* to http://localhost:8000.
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+const clearSession = () => {
+  safeLocalStorage.removeItem('token');
+  safeLocalStorage.removeItem('refreshToken');
+  delete api.defaults.headers.common.Authorization;
+};
 
 // Request interceptor to attach authentication token
 api.interceptors.request.use(
@@ -42,17 +31,44 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for globally handling errors
+// Response interceptor for refresh-token retry on expired access tokens
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Handle specific global status codes like 401 or 500
-    if (error.response && error.response.status === 401) {
-      // Handle unauthorized / logout user if necessary
-      safeLocalStorage.removeItem('token');
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/api/v1/auth/refresh')
+    ) {
+      originalRequest._retry = true;
+      const refreshToken = safeLocalStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, {
+            refresh_token: refreshToken,
+          });
+          const { access_token, refresh_token } = response.data;
+          safeLocalStorage.setItem('token', access_token);
+          safeLocalStorage.setItem('refreshToken', refresh_token);
+          api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          clearSession();
+          return Promise.reject(refreshError);
+        }
+      }
     }
+
+    if (error.response?.status === 401) {
+      clearSession();
+    }
+
     return Promise.reject(error);
   }
 );
 
+export { clearSession };
 export default api;

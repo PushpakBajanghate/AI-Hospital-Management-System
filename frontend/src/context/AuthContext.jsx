@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { clearSession } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -50,7 +50,8 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data);
         } catch (err) {
           console.error('Session restoration failed:', err);
-          logout();
+          clearSession();
+          setUser(null);
         }
       }
       setLoading(false);
@@ -62,9 +63,10 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const response = await api.post('/api/v1/auth/login/json', { email, password });
-      const { access_token, role, name } = response.data;
+      const { access_token, refresh_token } = response.data;
       
       safeLocalStorage.setItem('token', access_token);
+      safeLocalStorage.setItem('refreshToken', refresh_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       // Fetch fresh profile details
@@ -87,16 +89,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (fullName, email, password, role) => {
+  const register = async (fullName, email, password) => {
     setError(null);
     try {
       const response = await api.post('/api/v1/auth/register', {
         full_name: fullName,
         email,
         password,
-        role,
       });
-      addToast('Profile successfully registered! Redirecting...', 'success');
+      addToast('Patient account successfully registered! Redirecting...', 'success');
       return response.data;
     } catch (err) {
       let errMsg = 'Registration failed. Try again.';
@@ -113,9 +114,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    safeLocalStorage.removeItem('token');
-    delete api.defaults.headers.common['Authorization'];
+  const logout = async () => {
+    try {
+      if (safeLocalStorage.getItem('token')) {
+        await api.post('/api/v1/auth/logout');
+      }
+    } catch (err) {
+      console.warn('Logout request failed:', err);
+    }
+    clearSession();
     setUser(null);
     addToast('Signed out of MedOS secure console.', 'info');
   };

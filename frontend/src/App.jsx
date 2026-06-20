@@ -49,7 +49,7 @@ import api, { API_BASE_URL } from './services/api';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const apiBaseUrl = API_BASE_URL || 'http://localhost:8000';
+  const apiBaseUrl = API_BASE_URL;
   const [admissions, setAdmissions] = useState([]);
   const [appointmentsCount, setAppointmentsCount] = useState(0);
   const [patientsCount, setPatientsCount] = useState(0);
@@ -135,7 +135,7 @@ const Dashboard = () => {
               Access Patients Ledger
             </button>
             <a
-              href={`${apiBaseUrl}/docs`}
+              href={apiBaseUrl ? `${apiBaseUrl}/docs` : '/docs'}
               target="_blank"
               rel="noreferrer"
               className="bg-slate-800/80 border border-slate-700/85 hover:bg-slate-700/80 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
@@ -235,7 +235,7 @@ const LayoutShell = ({ children }) => {
     { label: "Patients Ledger", to: "/patients", icon: Users },
     { label: "Appointments", to: "/appointments", icon: Calendar },
     { label: "Bed Management", to: "/beds", icon: Bed },
-    { label: "AI Diagnostics", to: "/diagnostics", icon: ShieldAlert, guard: ['doctor', 'admin', 'staff'] },
+    { label: "AI Diagnostics", to: "/diagnostics", icon: ShieldAlert, guard: ['doctor', 'admin', 'nurse', 'staff'] },
     { label: "SMS Alerts Hub", to: "/notifications", icon: Bell },
     { label: "Billing & Invoices", to: "/billing", icon: CreditCard },
     { label: "Insurance Claims", to: "/insurance", icon: ShieldCheck },
@@ -650,7 +650,7 @@ function AppContent() {
           path="/patients/:id/history"
           element={
             <ProtectedRoute>
-              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'staff']}>
+              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'nurse', 'staff']}>
                 <LayoutShell>
                   <PatientHistory />
                 </LayoutShell>
@@ -672,7 +672,7 @@ function AppContent() {
           path="/diagnostics"
           element={
             <ProtectedRoute>
-              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'staff']}>
+              <RoleProtectedRoute allowedRoles={['doctor', 'admin', 'nurse', 'staff']}>
                 <LayoutShell>
                   <Diagnostics />
                 </LayoutShell>

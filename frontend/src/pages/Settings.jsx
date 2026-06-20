@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import safeLocalStorage from '../services/storage';
+import api from '../services/api';
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -13,7 +14,8 @@ import {
   Lock,
   Moon,
   Sun,
-  Activity
+  Activity,
+  UserPlus
 } from 'lucide-react';
 
 export default function Settings() {
@@ -23,6 +25,13 @@ export default function Settings() {
   const [name, setName] = useState(user?.full_name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [submitting, setSubmitting] = useState(false);
+  const [staffForm, setStaffForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    role: 'doctor',
+  });
+  const [creatingStaff, setCreatingStaff] = useState(false);
 
   // Clinical Configurations state
   const [consultationFee, setConsultationFee] = useState('150');
@@ -52,6 +61,34 @@ export default function Settings() {
       addToast('Hospital pricing and clinical configurations saved.', 'success');
       safeLocalStorage.setItem('medos_ai_simulation', aiSimulation.toString());
     }, 800);
+  };
+
+  const handleStaffChange = (field, value) => {
+    setStaffForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateStaff = async (e) => {
+    e.preventDefault();
+    if (!staffForm.full_name || !staffForm.email || !staffForm.password || !staffForm.role) {
+      addToast('All staff account fields are required.', 'error');
+      return;
+    }
+    if (staffForm.password.length < 6) {
+      addToast('Staff password must be at least 6 characters.', 'error');
+      return;
+    }
+
+    setCreatingStaff(true);
+    try {
+      await api.post('/api/v1/auth/users', staffForm);
+      addToast(`${staffForm.role} account created successfully.`, 'success');
+      setStaffForm({ full_name: '', email: '', password: '', role: 'doctor' });
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      addToast(Array.isArray(detail) ? detail.map((item) => item.msg).join(', ') : detail || 'Unable to create staff account.', 'error');
+    } finally {
+      setCreatingStaff(false);
+    }
   };
 
   return (
@@ -209,6 +246,80 @@ export default function Settings() {
               </div>
             </form>
           </div>
+
+          {user?.role === 'admin' && (
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 dark:bg-slate-900 dark:border-slate-800">
+              <h2 className="text-base font-extrabold text-slate-950 dark:text-white flex items-center gap-2.5 mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
+                <UserPlus className="w-4 h-4 text-blue-500" />
+                Staff Account Provisioning
+              </h2>
+
+              <form onSubmit={handleCreateStaff} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={staffForm.full_name}
+                      onChange={(e) => handleStaffChange('full_name', e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:bg-white text-xs dark:bg-slate-950 dark:border-slate-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={staffForm.email}
+                      onChange={(e) => handleStaffChange('email', e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:bg-white text-xs dark:bg-slate-950 dark:border-slate-800 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Role</label>
+                    <select
+                      value={staffForm.role}
+                      onChange={(e) => handleStaffChange('role', e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs dark:bg-slate-950 dark:border-slate-800 dark:text-white cursor-pointer"
+                    >
+                      <option value="doctor">Doctor</option>
+                      <option value="nurse">Nurse</option>
+                      <option value="receptionist">Receptionist</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Temporary Password</label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={staffForm.password}
+                      onChange={(e) => handleStaffChange('password', e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:bg-white text-xs dark:bg-slate-950 dark:border-slate-800 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={creatingStaff}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-400 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition active:scale-[0.98] inline-flex items-center gap-1.5"
+                  >
+                    {creatingStaff && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    Create Staff Account
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
         </div>
 

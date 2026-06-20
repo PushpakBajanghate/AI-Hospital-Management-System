@@ -12,6 +12,7 @@ from app.models.prescription import Prescription
 from app.models.user import User
 
 router = APIRouter()
+CLINICAL_ROLES = ["doctor", "nurse", "admin", "staff"]
 
 
 @router.get("/dashboard-stats")
@@ -125,6 +126,12 @@ def get_patient_clinical_history(
     """
     Retrieve clinical timeline dossier of all past visits and prescriptions for a specific patient.
     """
+    if current_user.role not in CLINICAL_ROLES:
+        raise HTTPException(
+            status_code=403,
+            detail="Clinical history is restricted to medical practitioners and admins."
+        )
+
     # 1. Verify patient exists
     patient = db.query(Patient).filter(Patient.id == patient_id).first()
     if not patient:
@@ -232,4 +239,3 @@ def get_ai_clinical_recommendations(
         "suggestions": suggestions,
         "summary": summary
     }
-

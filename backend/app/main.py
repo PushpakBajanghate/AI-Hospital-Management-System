@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.core.config import parse_cors, settings
 from app.core.database import get_db, engine
@@ -9,48 +9,41 @@ from app.models.base import Base
 from app.api.v1.api import api_router
 
 
+def ensure_schema_compatibility():
+    inspector = inspect(engine)
+    if "users" in inspector.get_table_names():
+        user_columns = {column["name"] for column in inspector.get_columns("users")}
+        if "refresh_token_hash" not in user_columns:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE users ADD COLUMN refresh_token_hash VARCHAR"))
+
+
 def seed_users(db: Session):
     from app.models.user import User
     from app.core import security
-    demo_users = [
-        {
-            "email": "demo@medos.com",
-            "password": "Demo@12345",
-            "full_name": "Dr. Demo User",
-            "role": "doctor",
-        }
-    ]
+    admin = db.query(User).filter(User.email == settings.DEFAULT_ADMIN_EMAIL).first()
+    if not admin:
+        db.add(User(
+            email=settings.DEFAULT_ADMIN_EMAIL,
+            hashed_password=security.get_password_hash(settings.DEFAULT_ADMIN_PASSWORD),
+            full_name=settings.DEFAULT_ADMIN_NAME,
+            role="admin",
+            is_active=True
+        ))
+        db.commit()
+        print(f"Seeded default admin login: {settings.DEFAULT_ADMIN_EMAIL}")
+        return
 
-    for demo in demo_users:
-        user = db.query(User).filter(User.email == demo["email"]).first()
-        if not user:
-            db.add(User(
-                email=demo["email"],
-                hashed_password=security.get_password_hash(demo["password"]),
-                full_name=demo["full_name"],
-                role=demo["role"],
-                is_active=True
-            ))
-            db.commit()
-            print(f"Successfully seeded demo login: {demo['email']} / {demo['password']}")
-            continue
-
-        changed = False
-        if not security.verify_password(demo["password"], user.hashed_password):
-            user.hashed_password = security.get_password_hash(demo["password"])
-            changed = True
-        if user.full_name != demo["full_name"]:
-            user.full_name = demo["full_name"]
-            changed = True
-        if user.role != demo["role"]:
-            user.role = demo["role"]
-            changed = True
-        if not user.is_active:
-            user.is_active = True
-            changed = True
-        if changed:
-            db.commit()
-            print(f"Updated demo login: {demo['email']} / {demo['password']}")
+    changed = False
+    if admin.role != "admin":
+        admin.role = "admin"
+        changed = True
+    if not admin.is_active:
+        admin.is_active = True
+        changed = True
+    if changed:
+        db.commit()
+        print(f"Verified default admin login: {settings.DEFAULT_ADMIN_EMAIL}")
 
 def seed_beds(db: Session):
     from app.models.bed import Bed
@@ -104,6 +97,7 @@ def startup_event():
     from app.core.database import engine
     from app.models.base import Base
     Base.metadata.create_all(bind=engine)
+    ensure_schema_compatibility()
 
     from app.core.database import SessionLocal
     db = SessionLocal()

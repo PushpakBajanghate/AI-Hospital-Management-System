@@ -6,16 +6,12 @@ import {
   Mail, 
   Lock, 
   User as UserIcon, 
-  ShieldAlert, 
   Loader2, 
   ArrowRight, 
   CheckCircle, 
   Eye, 
   EyeOff, 
   Sparkles, 
-  Heart, 
-  Users, 
-  Shield,
   Moon,
   Sun
 } from 'lucide-react';
@@ -25,7 +21,6 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('patient');
   
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -34,20 +29,12 @@ export default function Register() {
   const { register, error, setError, addToast, theme, toggleTheme } = useAuth();
   const navigate = useNavigate();
 
-  // Premium Grid Selector Roles List
-  const rolesList = [
-    { id: 'patient', name: 'Patient', desc: 'Book consultations & view history', icon: UserIcon },
-    { id: 'doctor', name: 'Practitioner', desc: 'Review triages & EMR files', icon: Heart },
-    { id: 'staff', name: 'Staff Member', desc: 'Manage scheduling & beds', icon: Users },
-    { id: 'admin', name: 'System Admin', desc: 'Complete console orchestration', icon: Shield },
-  ];
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidationError('');
     setError(null);
 
-    if (!fullName || !email || !password || !role) {
+    if (!fullName || !email || !password) {
       setValidationError('Please fill in all details.');
       addToast('Validation failed. Please enter all details.', 'error');
       return;
@@ -61,7 +48,7 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      await register(fullName, email, password, role);
+      await register(fullName, email, password);
       setSuccess(true);
       addToast('Account created successfully!', 'success');
       setTimeout(() => {
@@ -112,7 +99,7 @@ export default function Register() {
               Create Your Unified Portal Profile
             </h2>
             <p className="text-slate-350 mt-2 text-sm leading-relaxed font-semibold">
-              Unlock access to real-time clinical workflows. Registering binds your account to the backend SQLite engine, routing your navigation according to your specific hospital credentials.
+              Create a secure patient account for appointments and care coordination. Clinical staff access is provisioned only by hospital administrators.
             </p>
           </div>
         </div>
@@ -157,7 +144,7 @@ export default function Register() {
           <div className="hidden lg:block mb-6">
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Create Clinical Profile</h1>
             <p className="text-slate-550 dark:text-slate-400 mt-1 text-xs font-medium">
-              Complete the registration form below. Select your active role to calibrate your MedOS console dashboard.
+              Create your patient portal account. Doctor, nurse, receptionist, and admin credentials are issued by an administrator.
             </p>
           </div>
 
@@ -226,39 +213,8 @@ export default function Register() {
                   </div>
                 </div>
 
-                {/* VISUAL CUSTOM ROLE CARD SELECTOR GRID */}
-                <div className="space-y-2">
-                  <label className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Select System Role</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {rolesList.map((item) => {
-                      const IconComp = item.icon;
-                      const isSelected = role === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => setRole(item.id)}
-                          className={`flex flex-col items-start p-3 rounded-2xl border text-left transition select-none cursor-pointer ${
-                            isSelected
-                              ? 'bg-blue-600/10 border-blue-500 ring-1 ring-blue-500/30'
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 dark:bg-slate-950/50 dark:border-slate-800 dark:hover:border-slate-700/50'
-                          }`}
-                        >
-                          <div className={`p-1.5 rounded-lg mb-2 ${
-                            isSelected ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-450 dark:bg-slate-900 dark:border-slate-800'
-                          }`}>
-                            <IconComp className="w-4 h-4" />
-                          </div>
-                          <span className={`text-xs font-bold block ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                            {item.name}
-                          </span>
-                          <span className="text-[9px] text-slate-450 font-semibold leading-tight block mt-0.5">
-                            {item.desc}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="rounded-2xl border border-blue-100 bg-blue-50/80 p-4 text-xs font-semibold leading-relaxed text-blue-900 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-200">
+                  Public registration creates Patient access only. Hospital staff accounts are created from the admin console.
                 </div>
 
                 <div className="space-y-1.5">
@@ -268,7 +224,7 @@ export default function Register() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="•••••••• (Min 6 chars)"
+                      placeholder="Password (min 6 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full pl-11 pr-11 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition text-xs shadow-inner font-semibold dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-655"
@@ -284,7 +240,7 @@ export default function Register() {
                   {/* Password constraint feedback */}
                   {password && password.length < 6 && (
                     <span className="text-[9px] font-bold text-rose-500 dark:text-rose-405 block mt-1">
-                      ⚠️ Password must be at least 6 characters.
+                      Password must be at least 6 characters.
                     </span>
                   )}
                 </div>

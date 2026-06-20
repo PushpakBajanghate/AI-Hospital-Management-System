@@ -10,6 +10,8 @@ from app.models.admission import Admission
 from app.models.user import User
 
 router = APIRouter()
+OPERATIONS_ROLES = ["admin", "nurse", "receptionist", "staff"]
+CLINICAL_ROLES = ["doctor", "nurse", "admin", "staff"]
 
 
 @router.get("/", response_model=List[schemas.bed.BedResponse])
@@ -40,7 +42,7 @@ def create_bed(
     """
     Create a new clinical bed record. Restrict to Admin/Staff.
     """
-    if current_user.role not in ["admin", "staff"]:
+    if current_user.role not in OPERATIONS_ROLES:
         raise HTTPException(
             status_code=403,
             detail="Creating beds is restricted to administrative and clinical staff."
@@ -111,7 +113,7 @@ def transfer_patient_bed(
     Room transfer system. Moves an active admitted patient to a new target bed.
     """
     # Enforce role safety
-    if current_user.role not in ["doctor", "staff", "admin"]:
+    if current_user.role not in CLINICAL_ROLES:
         raise HTTPException(
             status_code=403,
             detail="Transferring patients is restricted to medical practitioners and staff."

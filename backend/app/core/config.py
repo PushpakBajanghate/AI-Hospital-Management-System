@@ -20,13 +20,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "AI Smart Hospital Management System"
     ENV: str = "development"
 
-    # CORS origins can be overridden with BACKEND_CORS_ORIGINS in production.
-    BACKEND_CORS_ORIGINS: str = (
-        "http://localhost:5173,"
-        "http://127.0.0.1:5173,"
-        "http://localhost:5174,"
-        "http://localhost:3000"
-    )
+    # CORS origins must be provided by environment for each deployment.
+    BACKEND_CORS_ORIGINS: str = ""
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = r"https://.*\.vercel\.app"
 
     # Database
@@ -35,6 +30,10 @@ class Settings(BaseSettings):
     # JWT Settings
     SECRET_KEY: str = "yoursecretkeyhereplaceholder"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+    DEFAULT_ADMIN_EMAIL: str = "admin@medos.com"
+    DEFAULT_ADMIN_PASSWORD: str = "Admin@12345"
+    DEFAULT_ADMIN_NAME: str = "MedOS Administrator"
 
     # Twilio API Configuration
     TWILIO_ACCOUNT_SID: Optional[str] = None

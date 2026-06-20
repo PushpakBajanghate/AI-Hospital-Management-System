@@ -65,6 +65,7 @@ def trigger_discharge_notifications(db: Session, admission_id: int):
 
 
 router = APIRouter()
+CLINICAL_ROLES = ["doctor", "nurse", "admin", "staff"]
 
 
 @router.get("/", response_model=List[schemas.bed.AdmissionResponse])
@@ -96,7 +97,7 @@ def admit_patient(
     Admit a patient, occupying a bed. Supports emergency priority-based auto-allocation.
     """
     # Enforce role safety
-    if current_user.role not in ["doctor", "staff", "admin"]:
+    if current_user.role not in CLINICAL_ROLES:
         raise HTTPException(
             status_code=403,
             detail="Admitting patients is restricted to medical practitioners and staff."
@@ -209,7 +210,7 @@ def discharge_patient(
     Discharge a patient, vacating their physical bed and logging summary notes.
     """
     # Enforce role safety
-    if current_user.role not in ["doctor", "staff", "admin"]:
+    if current_user.role not in CLINICAL_ROLES:
         raise HTTPException(
             status_code=403,
             detail="Discharging patients is restricted to medical practitioners and staff."
