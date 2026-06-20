@@ -63,7 +63,7 @@ export default function BedManagement() {
   const [validationError, setValidationError] = useState('');
 
   // Enforce roles
-  const canManage = user && ['doctor', 'staff', 'admin'].includes(user.role);
+  const canManage = user && ['doctor', 'nurse', 'admin', 'staff'].includes(user.role);
 
   // Load All Primary Data
   const loadData = async () => {

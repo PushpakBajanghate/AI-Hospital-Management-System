@@ -189,7 +189,7 @@ export default function Register() {
                       <input
                         type="text"
                         required
-                        placeholder="Dr. Alexander Fleming"
+                        placeholder="Aarav Sharma"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition text-xs shadow-inner font-semibold dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-655"

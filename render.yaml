@@ -14,5 +14,11 @@ services:
         value: "11520"
       - key: BACKEND_CORS_ORIGIN_REGEX
         value: https://.*\.vercel\.app
+      - key: BACKEND_CORS_ORIGINS
+        sync: false
+      - key: DEFAULT_ADMIN_EMAIL
+        value: admin@medos.com
+      - key: DEFAULT_ADMIN_PASSWORD
+        sync: false
       - key: DATABASE_URL
         sync: false

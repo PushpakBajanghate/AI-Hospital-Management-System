@@ -29,6 +29,9 @@ This project is easiest to deploy as two services:
 | `SECRET_KEY` | A long random secret |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `11520` |
 | `BACKEND_CORS_ORIGIN_REGEX` | `https://.*\.vercel\.app` |
+| `BACKEND_CORS_ORIGINS` | Your exact Vercel production domain |
+| `DEFAULT_ADMIN_EMAIL` | Initial admin email |
+| `DEFAULT_ADMIN_PASSWORD` | Strong initial admin password |
 
 After deploy, open:
 
@@ -56,8 +59,7 @@ It should return a healthy API response.
 | --- | --- |
 | `VITE_API_URL` | Your Render backend URL, for example `https://your-render-service.onrender.com` |
 
-If this variable is omitted, the frontend falls back to the Render service name in
-`render.yaml`: `https://ai-hospital-backend.onrender.com`.
+This variable is required for production API calls.
 
 4. Deploy.
 
