@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api, { clearSession } from '../services/api';
+import api, { clearSession, API_BASE_URL } from '../services/api';
+import safeLocalStorage from '../services/storage';
 
 const AuthContext = createContext(null);
-
-import safeLocalStorage from '../services/storage';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -29,17 +28,22 @@ export const AuthProvider = ({ children }) => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-
   const addToast = (message, type = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts((prev) => [...prev, { id, message, type }]);
+    // Auto-remove success/info toasts after 5 seconds
+    if (type !== 'error') {
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 5000);
+    }
   };
 
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Re-authenticate user session on mount
+  // Re-authenticate user session on app mount (restore from saved token)
   useEffect(() => {
     const bootstrapAuth = async () => {
       const token = safeLocalStorage.getItem('token');
@@ -49,7 +53,7 @@ export const AuthProvider = ({ children }) => {
           const response = await api.get('/api/v1/auth/me');
           setUser(response.data);
         } catch (err) {
-          console.error('Session restoration failed:', err);
+          console.warn('Session restoration failed — clearing stored token:', err?.response?.status);
           clearSession();
           setUser(null);
         }
@@ -59,30 +63,44 @@ export const AuthProvider = ({ children }) => {
     bootstrapAuth();
   }, []);
 
+  /**
+   * Extract a human-readable error message from an Axios error response.
+   */
+  const extractErrorMessage = (err, fallback) => {
+    if (!err.response) {
+      // Network error or CORS block — give a helpful message
+      if (!API_BASE_URL) {
+        return 'Backend URL is not configured. Please set VITE_API_URL in your Vercel environment variables.';
+      }
+      return `Cannot reach the server at ${API_BASE_URL}. Please check your connection or try again shortly (the server may be waking up).`;
+    }
+    const detail = err.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      return detail.map((e) => e.msg).join(', ');
+    }
+    if (typeof detail === 'string') {
+      return detail;
+    }
+    return fallback;
+  };
+
   const login = async (email, password) => {
     setError(null);
     try {
       const response = await api.post('/api/v1/auth/login/json', { email, password });
       const { access_token, refresh_token } = response.data;
-      
+
       safeLocalStorage.setItem('token', access_token);
       safeLocalStorage.setItem('refreshToken', refresh_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+
       // Fetch fresh profile details
       const profileResponse = await api.get('/api/v1/auth/me');
       setUser(profileResponse.data);
       addToast(`Welcome back, ${profileResponse.data.full_name || 'User'}!`, 'success');
       return profileResponse.data;
     } catch (err) {
-      let errMsg = 'Login failed. Please check your credentials.';
-      if (err.response?.data?.detail) {
-        if (Array.isArray(err.response.data.detail)) {
-          errMsg = err.response.data.detail.map(e => e.msg).join(', ');
-        } else {
-          errMsg = err.response.data.detail;
-        }
-      }
+      const errMsg = extractErrorMessage(err, 'Login failed. Please check your credentials.');
       setError(errMsg);
       addToast(errMsg, 'error');
       throw new Error(errMsg);
@@ -97,17 +115,10 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
-      addToast('Patient account successfully registered! Redirecting...', 'success');
+      addToast('Patient account successfully registered! Redirecting to login...', 'success');
       return response.data;
     } catch (err) {
-      let errMsg = 'Registration failed. Try again.';
-      if (err.response?.data?.detail) {
-        if (Array.isArray(err.response.data.detail)) {
-          errMsg = err.response.data.detail.map(e => e.msg).join(', ');
-        } else {
-          errMsg = err.response.data.detail;
-        }
-      }
+      const errMsg = extractErrorMessage(err, 'Registration failed. Please try again.');
       setError(errMsg);
       addToast(errMsg, 'error');
       throw new Error(errMsg);

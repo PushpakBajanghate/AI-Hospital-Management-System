@@ -79,6 +79,31 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
+# -----------------------------------------------------------------------
+# CORS MIDDLEWARE — must be added BEFORE including routers
+# -----------------------------------------------------------------------
+# Build the list of explicitly allowed origins
+allowed_origins = parse_cors(settings.BACKEND_CORS_ORIGINS) if settings.BACKEND_CORS_ORIGINS else []
+
+# Always allow localhost origins for local development
+local_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
+all_origins = list(set(allowed_origins + local_origins))
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=all_origins,
+    allow_origin_regex=settings.BACKEND_CORS_ORIGIN_REGEX,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.on_event("startup")
 def startup_event():
     import os
@@ -120,19 +145,6 @@ def shutdown_event():
 
 # Register routes
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-# Set all CORS enabled origins
-if settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            str(origin).strip("/") for origin in parse_cors(settings.BACKEND_CORS_ORIGINS)
-        ],
-        allow_origin_regex=settings.BACKEND_CORS_ORIGIN_REGEX,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
 
 @app.get("/")

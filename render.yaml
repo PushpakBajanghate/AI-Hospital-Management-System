@@ -8,17 +8,45 @@ services:
     envVars:
       - key: ENV
         value: production
+
+      # JWT — Render auto-generates a secure random secret
       - key: SECRET_KEY
         generateValue: true
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "11520"
-      - key: BACKEND_CORS_ORIGIN_REGEX
-        value: https://.*\.vercel\.app
-      - key: BACKEND_CORS_ORIGINS
-        sync: false
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "30"
+
+      # Default Admin Account (seeded on first startup)
       - key: DEFAULT_ADMIN_EMAIL
         value: admin@medos.com
+      - key: DEFAULT_ADMIN_NAME
+        value: MedOS Administrator
+      # DEFAULT_ADMIN_PASSWORD — set this manually in Render dashboard
       - key: DEFAULT_ADMIN_PASSWORD
         sync: false
+
+      # CORS — set this to your Vercel frontend URL(s), comma-separated
+      # Example: https://ai-hospital-xyz.vercel.app,https://yourdomain.com
+      # The regex below already covers all *.vercel.app preview URLs automatically.
+      - key: BACKEND_CORS_ORIGINS
+        sync: false
+      - key: BACKEND_CORS_ORIGIN_REGEX
+        value: "https://.*\\.vercel\\.app"
+
+      # Database — link a Render PostgreSQL instance or set manually
+      # Format: postgresql://user:password@host:5432/dbname
       - key: DATABASE_URL
+        sync: false
+
+      # Twilio (optional — SMS features disabled if not set)
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+
+      # OpenAI (optional — AI chatbot disabled if not set)
+      - key: OPENAI_API_KEY
         sync: false
