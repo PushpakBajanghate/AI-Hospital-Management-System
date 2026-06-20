@@ -1,0 +1,23 @@
+# Vercel deploys ONLY the frontend (React/Vite).
+# The backend (FastAPI) is deployed separately to Render.com.
+
+# Ignore the Python backend — Render handles this
+backend/
+api/
+
+# Ignore Python artifacts
+*.pyc
+__pycache__/
+*.egg-info/
+.venv/
+venv/
+
+# Ignore other non-frontend files
+docker-compose.yml
+render.yaml
+hospital.db
+*.db
+
+# Ignore frontend build artifacts (Vercel builds these itself)
+frontend/node_modules/
+frontend/dist/
